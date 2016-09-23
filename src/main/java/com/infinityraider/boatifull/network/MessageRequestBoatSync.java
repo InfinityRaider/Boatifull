@@ -29,7 +29,7 @@ public class MessageRequestBoatSync extends MessageBase<IMessage> {
     @Override
     protected void processMessage(MessageContext ctx) {
         if(ctx.side == Side.SERVER && this.boat != null) {
-            NetworkWrapper.getInstance().sendTo(new MessageSyncBoatLinkData(this.boat), ctx.getServerHandler().playerEntity);
+            NetworkWrapper.getInstance().sendTo(new MessageSyncBoatId(this.boat), ctx.getServerHandler().playerEntity);
         }
     }
 

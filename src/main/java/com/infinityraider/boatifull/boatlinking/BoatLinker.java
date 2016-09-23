@@ -1,5 +1,6 @@
 package com.infinityraider.boatifull.boatlinking;
 
+import com.infinityraider.boatifull.entity.EntityBoatLink;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -25,10 +26,13 @@ public class BoatLinker implements IBoatLinker {
     private final Map<EntityPlayer, EntityBoat> linkingPlayerToBoat;
     private final Map<EntityBoat, EntityPlayer> linkingBoatToPlayer;
 
+    private final Map<EntityBoat, EntityBoatLink> boatLinks;
+
     private BoatLinker() {
         this.linkKeyItem = null;
         this.linkingPlayerToBoat = new IdentityHashMap<>();
         this.linkingBoatToPlayer = new IdentityHashMap<>();
+        this.boatLinks = new IdentityHashMap<>();
     }
 
     @Override
@@ -86,15 +90,15 @@ public class BoatLinker implements IBoatLinker {
 
     @Override
     public EnumBoatLinkResult canLinkBoats(EntityBoat leader, EntityBoat follower) {
-        IBoatLinkData leaderLink = getBoatLink(leader);
-        IBoatLinkData followerLink = getBoatLink(follower);
+        IBoatLink leaderLink = getBoatLink(leader);
+        IBoatLink followerLink = getBoatLink(follower);
         if(!areBoatsCloseEnough(leader, follower)) {
             return EnumBoatLinkResult.FAIL_TOO_FAR;
         }
-        if(followerLink.hasLeadingBoat()) {
+        if(followerLink != null) {
             return EnumBoatLinkResult.FAIL_ALREADY_HAS_LEADER;
         }
-        if(checkForLinkLoopRecursive(leaderLink, followerLink)) {
+        if(checkForLinkLoopRecursive(leader, follower)) {
             return EnumBoatLinkResult.FAIL_LINK_LOOP;
         }
         return EnumBoatLinkResult.SUCCESS_FINISH;
@@ -105,15 +109,16 @@ public class BoatLinker implements IBoatLinker {
         return a != b && a.getEntityWorld() == b.getEntityWorld() && a.getDistanceSqToEntity(b) <= LINK_RANGE * LINK_RANGE;
     }
 
-    private boolean checkForLinkLoopRecursive(IBoatLinkData leader, IBoatLinkData follower) {
-        if(leader.hasLeadingBoat()) {
-            EntityBoat leadingBoat = leader.getLeadingBoat();
+    private boolean checkForLinkLoopRecursive(EntityBoat leader, EntityBoat follower) {
+        IBoatLink leaderLink = this.getBoatLink(leader);
+        if(leaderLink != null) {
+            EntityBoat leadingBoat = leaderLink.getLeader();
             if(leadingBoat == null) {
                 return true;
-            } else if(leadingBoat == follower.getBoat()) {
+            } else if(leadingBoat == follower) {
                 return true;
             }
-            return checkForLinkLoopRecursive(getBoatLink(leadingBoat), follower);
+            return checkForLinkLoopRecursive(leadingBoat, follower);
         }
         return false;
     }
@@ -124,14 +129,32 @@ public class BoatLinker implements IBoatLinker {
         if(result.isOk()) {
             removeLinkingProgress(leader);
             removeLinkingProgress(follower);
-            getBoatLink(follower).setLeadingBoat(leader);
+            EntityBoatLink boatLink = new EntityBoatLink(leader, follower);
+            this.boatLinks.put(follower, boatLink);
+            leader.getEntityWorld().spawnEntityInWorld(boatLink);
+            boatLink.mountFollower();
         }
         return result;
     }
 
     @Override
-    public IBoatLinkData getBoatLink(EntityBoat boat) {
-        return BoatLinkProvider.getLinkedBoats(boat);
+    public void unlinkBoat(EntityBoat follower) {
+        if(boatLinks.containsKey(follower)) {
+            IBoatLink link = getBoatLink(follower);
+            boatLinks.remove(follower);
+            link.breakLink();
+        } else {
+            boatLinks.remove(follower);
+        }
+    }
+
+    @Override
+    public IBoatLink getBoatLink(EntityBoat boat) {
+        return this.boatLinks.get(boat);
+    }
+
+    public void validateBoatLink(EntityBoatLink link) {
+        this.boatLinks.put(link.getFollower(), link);
     }
 
     private void removeLinkingProgress(EntityBoat boat) {

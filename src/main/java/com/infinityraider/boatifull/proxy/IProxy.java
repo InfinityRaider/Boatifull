@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.event.*;
 public interface IProxy extends IProxyBase {
     @Override
     default void preInitEnd(FMLPreInitializationEvent event) {
-        CapabilityManager.INSTANCE.register(IBoatLinkData.class, new BoatLinkProvider.Storage(), BoatLinkData.class);
+        CapabilityManager.INSTANCE.register(IBoatId.class, new BoatIdProvider.Storage(), BoatId.class);
     }
 
     @Override
@@ -25,7 +25,6 @@ public interface IProxy extends IProxyBase {
     @Override
     default void registerEventHandlers() {
         this.registerEventHandler(BoatLinker.getInstance());
-        this.registerEventHandler(BoatMovementHandler.getInstance());
         this.registerEventHandler(CapabilityHandler.getInstance());
         this.registerEventHandler(InteractionHandler.getInstance());
     }

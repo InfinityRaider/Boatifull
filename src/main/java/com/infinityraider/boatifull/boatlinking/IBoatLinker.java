@@ -90,9 +90,15 @@ public interface IBoatLinker {
     EnumBoatLinkResult linkBoats(EntityBoat leader, EntityBoat follower);
 
     /**
+     * Unlinks a follower from its leader
+     * @param follower the follower to break the link for
+     */
+    void unlinkBoat(EntityBoat follower);
+
+    /**
      * Gets the boat link property for a boat
      * @param boat boat object
      * @return the boat link property object
      */
-    IBoatLinkData getBoatLink(EntityBoat boat);
+    IBoatLink getBoatLink(EntityBoat boat);
 }

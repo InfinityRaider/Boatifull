@@ -1,7 +1,7 @@
 package com.infinityraider.boatifull.network;
 
-import com.infinityraider.boatifull.boatlinking.BoatLinkProvider;
-import com.infinityraider.boatifull.boatlinking.IBoatLinkData;
+import com.infinityraider.boatifull.boatlinking.BoatIdProvider;
+import com.infinityraider.boatifull.boatlinking.IBoatId;
 import com.infinityraider.infinitylib.network.MessageBase;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
@@ -12,19 +12,19 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 
-public class MessageSyncBoatLinkData extends MessageBase<IMessage> {
+public class MessageSyncBoatId extends MessageBase<IMessage> {
     private EntityBoat boat;
     private NBTTagCompound data;
 
-    public MessageSyncBoatLinkData() {
+    public MessageSyncBoatId() {
         super();
     }
 
-    public MessageSyncBoatLinkData(EntityBoat boat) {
+    public MessageSyncBoatId(EntityBoat boat) {
         this();
         this.boat = boat;
-        IBoatLinkData linkData = BoatLinkProvider.getLinkedBoats(boat);
-        this.data = linkData == null ? null : linkData.writeToNBT();
+        IBoatId boatId = BoatIdProvider.getBoatIdData(boat);
+        this.data = boatId == null ? null : boatId.writeToNBT();
     }
 
     @Override
@@ -35,9 +35,9 @@ public class MessageSyncBoatLinkData extends MessageBase<IMessage> {
     @Override
     protected void processMessage(MessageContext ctx) {
         if(ctx.side == Side.CLIENT && this.boat != null && this.data != null) {
-            IBoatLinkData linkData = BoatLinkProvider.getLinkedBoats(this.boat);
-            if(linkData != null) {
-                linkData.readFromNBT(this.data);
+            IBoatId boatId = BoatIdProvider.getBoatIdData(this.boat);
+            if(boatId != null) {
+                boatId.readFromNBT(this.data);
             }
         }
     }

@@ -1,8 +1,11 @@
 package com.infinityraider.boatifull.item;
 
 import com.google.common.collect.ImmutableList;
-import com.infinityraider.boatifull.boatlinking.BoatLinkProvider;
-import com.infinityraider.boatifull.boatlinking.IBoatLinkData;
+import com.infinityraider.boatifull.boatlinking.BoatIdProvider;
+import com.infinityraider.boatifull.boatlinking.BoatLinker;
+import com.infinityraider.boatifull.boatlinking.IBoatId;
+import com.infinityraider.boatifull.boatlinking.IBoatLink;
+import com.infinityraider.boatifull.entity.EntityBoatLink;
 import com.infinityraider.infinitylib.item.ItemDebuggerBase;
 import com.infinityraider.infinitylib.utility.RayTraceHelper;
 import com.infinityraider.infinitylib.utility.debug.DebugMode;
@@ -48,22 +51,35 @@ public class ItemDebugger extends ItemDebuggerBase {
             RayTraceResult target = RayTraceHelper.getTargetEntityOrBlock(player, 16);
             if(target != null && target.typeOfHit == RayTraceResult.Type.ENTITY && target.entityHit != null) {
                 Entity entity = target.entityHit;
+                if(entity instanceof EntityBoatLink) {
+                    entity = ((EntityBoatLink) entity).getFollower();
+                }
                 if(entity instanceof EntityBoat) {
                     EntityBoat boat = (EntityBoat) entity;
-                    IBoatLinkData data = BoatLinkProvider.getLinkedBoats(boat);
+                    IBoatId boatId = BoatIdProvider.getBoatIdData(boat);
 
                     player.addChatComponentMessage(new TextComponentString("Boat data for " + (world.isRemote ? "CLIENT:" : "SERVER:")));
                     player.addChatComponentMessage(new TextComponentString(" - Entity id: " + boat.getEntityId()));
-                    if(data == null) {
-                        player.addChatComponentMessage(new TextComponentString(" - Error: no link data found"));
+                    if (boatId == null) {
+                        player.addChatComponentMessage(new TextComponentString(" - Error: no id data found"));
                     } else {
-                        if(data.hasLeadingBoat()) {
-                            player.addChatComponentMessage(new TextComponentString(" - This boat has a leading boat"));
-                            EntityBoat leader = data.getLeadingBoat();
-                            player.addChatComponentMessage(new TextComponentString(" - Leading boat is: " + (leader == null ? "null" : leader.getEntityId())));
+                        player.addChatComponentMessage(new TextComponentString(" - Unique boat id: " + boatId.getId()));
+                    }
+
+                    IBoatLink link = BoatLinker.getInstance().getBoatLink(boat);
+                    if (link != null) {
+                        player.addChatComponentMessage(new TextComponentString(" - This boat has a leading boat"));
+                        EntityBoat leader = link.getLeader();
+                        player.addChatComponentMessage(new TextComponentString(" - Leading boat entity id: " + (leader == null ? "null" : leader.getEntityId())));
+
+                        IBoatId leadingId = BoatIdProvider.getBoatIdData(leader);
+                        if(leadingId == null) {
+                            player.addChatComponentMessage(new TextComponentString(" - Error: no id data found for leader"));
                         } else {
-                            player.addChatComponentMessage(new TextComponentString(" - This boat has no leading boat"));
+                            player.addChatComponentMessage(new TextComponentString(" -Leading boat unique boat id: " + leadingId.getId()));
                         }
+                    } else {
+                        player.addChatComponentMessage(new TextComponentString(" - This boat has no leading boat"));
                     }
                 }
             }

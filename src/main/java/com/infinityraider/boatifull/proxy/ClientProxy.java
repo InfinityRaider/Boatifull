@@ -1,7 +1,6 @@
 package com.infinityraider.boatifull.proxy;
 
 import com.infinityraider.boatifull.handler.*;
-import com.infinityraider.boatifull.render.BoatLinkRenderer;
 import com.infinityraider.infinitylib.proxy.base.IClientProxyBase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -14,6 +13,5 @@ public class ClientProxy implements IProxy, IClientProxyBase {
         IProxy.super.registerEventHandlers();
         this.registerEventHandler(EntitySpawnHandler.getInstance());
         this.registerEventHandler(TooltipHandler.getInstance());
-        this.registerEventHandler(BoatLinkRenderer.getInstance());
     }
 }
