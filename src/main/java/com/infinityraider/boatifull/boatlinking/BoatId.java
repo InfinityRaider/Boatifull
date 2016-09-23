@@ -7,14 +7,11 @@ import com.infinityraider.infinitylib.network.NetworkWrapper;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.nbt.NBTTagCompound;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class BoatId implements IBoatId {
     private static int largestId;
-    private static final Deque<Integer> FREE_IDS = new ArrayDeque<>();
+    private static final Set<Integer> FREE_IDS = new HashSet<>();
     private static final Map<Integer, EntityBoat> BOATS = new HashMap<>();
 
     /** The boat owning this property */
@@ -61,7 +58,7 @@ public class BoatId implements IBoatId {
         int[] freeIds = tag.getIntArray(Names.NBT.OWNER);
         FREE_IDS.clear();
         for(int id : freeIds) {
-            FREE_IDS.push(id);
+            FREE_IDS.add(id);
         }
         BOATS.put(this.getId(), this.getBoat());
     }
@@ -72,7 +69,9 @@ public class BoatId implements IBoatId {
             id = largestId + 1;
             largestId = id;
         } else {
-            id = FREE_IDS.pop();
+            Iterator<Integer> iterator = FREE_IDS.iterator();
+            id = iterator.next();
+            FREE_IDS.remove(id);
         }
         return id;
     }
@@ -82,6 +81,8 @@ public class BoatId implements IBoatId {
     }
 
     public static void onBoatRemoved(EntityBoat boat) {
-        FREE_IDS.push(BoatIdProvider.getBoatId(boat));
+        if(boat != null && !boat.getEntityWorld().isRemote) {
+            FREE_IDS.add(BoatIdProvider.getBoatId(boat));
+        }
     }
 }
