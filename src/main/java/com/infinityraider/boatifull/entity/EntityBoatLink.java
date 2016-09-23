@@ -5,7 +5,8 @@ import com.infinityraider.boatifull.boatlinking.BoatLinker;
 import com.infinityraider.boatifull.boatlinking.IBoatLink;
 import com.infinityraider.boatifull.reference.Names;
 import com.infinityraider.boatifull.render.RenderBoatLink;
-import com.infinityraider.infinitylib.utility.LogHelper;
+import com.infinityraider.infinitylib.network.MessageSetEntityDead;
+import com.infinityraider.infinitylib.network.NetworkWrapper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
@@ -17,6 +18,7 @@ import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -378,11 +380,20 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
     public void setDead() {
         if(!this.worldObj.isRemote) {
             BoatLinker.getInstance().unlinkBoat(this.getFollower());
+            NetworkWrapper.getInstance().sendToAll(new MessageSetEntityDead(this));
         }
         if(this.getFollower() != null) {
             this.getFollower().dismountRidingEntity();
         }
         super.setDead();
+    }
+
+    @Override
+    public boolean attackEntityFrom(DamageSource source, float amount) {
+        if(this.getFollower() != null) {
+            return this.getFollower().attackEntityFrom(source, amount);
+        }
+        return false;
     }
 
     @Override

@@ -24,6 +24,7 @@ public interface IProxy extends IProxyBase {
 
     @Override
     default void registerEventHandlers() {
+        this.registerEventHandler(BoatDeathListener.getInstance());
         this.registerEventHandler(BoatLinker.getInstance());
         this.registerEventHandler(CapabilityHandler.getInstance());
         this.registerEventHandler(InteractionHandler.getInstance());

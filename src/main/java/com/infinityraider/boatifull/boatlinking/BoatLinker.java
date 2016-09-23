@@ -2,15 +2,16 @@ package com.infinityraider.boatifull.boatlinking;
 
 import com.infinityraider.boatifull.entity.EntityBoatLink;
 import net.minecraft.entity.item.EntityBoat;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class BoatLinker implements IBoatLinker {
     private static final BoatLinker INSTANCE = new BoatLinker();
@@ -142,6 +143,8 @@ public class BoatLinker implements IBoatLinker {
             IBoatLink link = getBoatLink(follower);
             boatLinks.remove(follower);
             link.breakLink();
+            EntityItem item = new EntityItem(follower.getEntityWorld(), follower.posX, follower.posY, follower.posZ, new ItemStack(this.getLinkKeyItem()));
+            follower.getEntityWorld().spawnEntityInWorld(item);
         } else {
             boatLinks.remove(follower);
         }
@@ -168,6 +171,24 @@ public class BoatLinker implements IBoatLinker {
             linkingBoatToPlayer.remove(linkingPlayerToBoat.get(player));
             linkingPlayerToBoat.remove(player);
         }
+    }
+
+    public void onBoatDeath(EntityBoat boat) {
+        if(this.boatLinks.containsKey(boat)) {
+            this.unlinkBoat(boat);
+        }
+        Set<Map.Entry<EntityBoat, EntityBoatLink>> entrySet = boatLinks.entrySet();
+        Iterator<Map.Entry<EntityBoat, EntityBoatLink>> iterator = entrySet.iterator();
+        List<EntityBoat> linkedBoats = new ArrayList<>();
+        while(iterator.hasNext()) {
+            Map.Entry<EntityBoat, EntityBoatLink> entry = iterator.next();
+            if(entry.getValue() == null || entry.getKey() == null) {
+                iterator.remove();
+            } else if(entry.getValue().getLeader() == boat) {
+                linkedBoats.add(entry.getKey());
+            }
+        }
+        linkedBoats.forEach(this::unlinkBoat);
     }
 
     @SubscribeEvent

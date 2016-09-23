@@ -80,4 +80,8 @@ public class BoatId implements IBoatId {
     public static EntityBoat getBoatFromId(int id) {
         return BOATS.get(id);
     }
+
+    public static void onBoatRemoved(EntityBoat boat) {
+        FREE_IDS.push(BoatIdProvider.getBoatId(boat));
+    }
 }
