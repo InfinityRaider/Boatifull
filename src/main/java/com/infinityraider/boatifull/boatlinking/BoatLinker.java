@@ -90,7 +90,6 @@ public class BoatLinker implements IBoatLinker {
 
     @Override
     public EnumBoatLinkResult canLinkBoats(EntityBoat leader, EntityBoat follower) {
-        IBoatLink leaderLink = getBoatLink(leader);
         IBoatLink followerLink = getBoatLink(follower);
         if(!areBoatsCloseEnough(leader, follower)) {
             return EnumBoatLinkResult.FAIL_TOO_FAR;

@@ -67,8 +67,8 @@ public class RenderBoatLink extends Render<EntityBoatLink> {
         double z2 = zL - zF + dX*sinL - dZ*cosL;
 
         //amplitude of the cable slack
-        //Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2) + (z1 - z2)*(z1 - z2))
-        double a = this.getAmplitude(leader.getDistanceToEntity(follower));
+        //double a = this.getAmplitude(leader.getDistanceToEntity(follower));
+        double a = this.getAmplitude(Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2) + (z1 - z2)*(z1 - z2)));
 
         Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer buffer = tessellator.getBuffer();

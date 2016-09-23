@@ -3,6 +3,7 @@ package com.infinityraider.boatifull.handler;
 import com.infinityraider.boatifull.boatlinking.BoatLinker;
 import com.infinityraider.boatifull.boatlinking.EnumBoatLinkResult;
 import com.infinityraider.boatifull.boatlinking.IBoatLinker;
+import com.infinityraider.boatifull.entity.EntityBoatLink;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -28,8 +29,13 @@ public class InteractionHandler {
         if(event.getEntityPlayer().getEntityWorld().isRemote) {
             return;
         }
-        if(event.getTarget() instanceof EntityBoat) {
-            EntityBoat boat = (EntityBoat) event.getTarget();
+        EntityBoat boat = null;
+        if(event.getTarget() instanceof EntityBoatLink) {
+            boat = ((EntityBoatLink) event.getTarget()).getFollower();
+        } else if(event.getTarget() instanceof EntityBoat) {
+            boat = (EntityBoat) event.getTarget();
+        }
+        if(boat != null) {
             EntityPlayer player = event.getEntityPlayer();
             if(!player.isSneaking()) {
                 return;
