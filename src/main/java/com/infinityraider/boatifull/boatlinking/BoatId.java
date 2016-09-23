@@ -10,7 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import java.util.*;
 
 public class BoatId implements IBoatId {
-    private static int largestId;
+    private static int largestId = -1;
     private static final Set<Integer> FREE_IDS = new HashSet<>();
     private static final Map<Integer, EntityBoat> BOATS = new HashMap<>();
 
@@ -22,12 +22,14 @@ public class BoatId implements IBoatId {
 
     @Override
     public IBoatId setBoat(EntityBoat boat) {
-        this.owner = boat;
-        if(!boat.getEntityWorld().isRemote) {
-            this.id = getNextId();
-            BOATS.put(this.getId(), this.getBoat());
-        } else {
-            NetworkWrapper.getInstance().sendToServer(new MessageRequestBoatSync(this.owner));
+        if(this.owner == null) {
+            this.owner = boat;
+            if (!boat.getEntityWorld().isRemote) {
+                this.id = getNextId();
+                BOATS.put(this.getId(), this.getBoat());
+            } else {
+                NetworkWrapper.getInstance().sendToServer(new MessageRequestBoatSync(this.owner));
+            }
         }
         return this;
     }
