@@ -174,6 +174,10 @@ public class BoatLinker implements IBoatLinker {
     }
 
     public void onBoatDeath(EntityBoat boat) {
+        if(linkingBoatToPlayer.containsKey(boat)) {
+            linkingPlayerToBoat.remove(linkingBoatToPlayer.get(boat));
+            linkingBoatToPlayer.remove(boat);
+        }
         if(this.boatLinks.containsKey(boat)) {
             this.unlinkBoat(boat);
         }

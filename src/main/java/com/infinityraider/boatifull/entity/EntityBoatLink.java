@@ -121,14 +121,7 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
         if(entity == this.getFollower()) {
             return;
         }
-        if (entity instanceof EntityBoat) {
-            if (entity.getEntityBoundingBox().minY < this.getEntityBoundingBox().maxY) {
-                super.applyEntityCollision(entity);
-            }
-        }
-        else if (entity.getEntityBoundingBox().minY <= this.getEntityBoundingBox().minY) {
-            super.applyEntityCollision(entity);
-        }
+        super.applyEntityCollision(entity);
     }
 
     @Override
@@ -390,10 +383,7 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
 
     @Override
     public boolean attackEntityFrom(DamageSource source, float amount) {
-        if(this.getFollower() != null) {
-            return this.getFollower().attackEntityFrom(source, amount);
-        }
-        return false;
+        return this.getFollower() != null && this.getFollower().attackEntityFrom(source, amount);
     }
 
     @Override
