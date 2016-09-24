@@ -8,6 +8,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 
 import static net.minecraftforge.fml.common.eventhandler.EventPriority.LOWEST;
 
@@ -28,6 +29,16 @@ public class TooltipHandler {
         if(stack != null && stack.getItem() == BoatLinker.getInstance().getLinkKeyItem()) {
             event.getToolTip().add("");
             event.getToolTip().add(ChatFormatting.GRAY + I18n.translateToLocal("boatifull.tooltip.link_item"));
+            if(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+                event.getToolTip().add("");
+                event.getToolTip().add(ChatFormatting.DARK_GRAY  + "" + ChatFormatting.ITALIC + I18n.translateToLocal("boatifull.tooltip.link_boat_first"));
+                event.getToolTip().add(ChatFormatting.DARK_GRAY  + "" + ChatFormatting.ITALIC + I18n.translateToLocal("boatifull.tooltip.link_boat_second"));
+                event.getToolTip().add(ChatFormatting.DARK_GRAY  + "" + ChatFormatting.ITALIC + I18n.translateToLocal("boatifull.tooltip.cancel_link"));
+                event.getToolTip().add("");
+                event.getToolTip().add(ChatFormatting.DARK_GRAY  + "" + ChatFormatting.ITALIC + I18n.translateToLocal("boatifull.tooltip.link_info"));
+            } else {
+                event.getToolTip().add(ChatFormatting.DARK_GRAY  + "" + ChatFormatting.ITALIC + I18n.translateToLocal("boatifull.tooltip.more_info"));
+            }
         }
     }
 

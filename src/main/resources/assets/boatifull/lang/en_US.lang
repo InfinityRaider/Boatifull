@@ -7,6 +7,12 @@ boatifull.message.fail_link_loop=This would introduce a boat linking loop
 boatifull.message.fail_player_already_linking=This player is already linking a boat
 boatifull.message.fail_boat_already_linking=This boat is already being linked
 boatifull.message.fail_not_linking=This player is currently not linking a boat
+boatifull.message.cancel_link=Linking cancelled
 
 //tooltip
 boatifull.tooltip.link_item=Shift click this item to link boats together
+boatifull.tooltip.link_boat_first=Sneak right click a boat to select a leading boat to tie another boat to.
+boatifull.tooltip.link_boat_second=Sneak right click a second boat to tie to the leading boat.
+boatifull.tooltip.cancel_link=Sneak right click in the air to cancel a linking operation.
+boatifull.tooltip.link_info=A boat tied to another boat can no longer be controlled but will be pulled by the leading boat.
+boatifull.tooltip.more_info=(Hold shift for more information)
