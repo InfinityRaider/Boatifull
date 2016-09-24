@@ -46,12 +46,10 @@ public class BoatDeathListener implements IWorldEventListener {
 
     @Override
     public void onEntityRemoved(Entity entity) {
-        if(entity instanceof EntityBoat) {
+        if ((entity instanceof EntityBoat) && !entity.getEntityWorld().isRemote) {
             EntityBoat boat = (EntityBoat) entity;
+            BoatLinker.getInstance().onBoatDeath(boat);
             BoatId.onBoatRemoved(boat);
-            if(!boat.getEntityWorld().isRemote) {
-                BoatLinker.getInstance().onBoatDeath(boat);
-            }
         }
     }
 

@@ -49,6 +49,8 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
     private EntityBoat.Status status;
     private EntityBoat.Status previousStatus;
 
+    private boolean validated;
+
     public EntityBoatLink(World world) {
         super(world);
         this.setSize(1.375F, 0.5625F);
@@ -204,6 +206,13 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
     @Override
     public void onUpdate() {
         if(this.ownerId < 0) {
+            this.setDead();
+            return;
+        }
+        if(!this.validated) {
+            this.validated = BoatLinker.getInstance().validateBoatLink(this);
+        }
+        if(!this.worldObj.isRemote && this.getFollower() == null && this.validated) {
             this.setDead();
             return;
         }
@@ -396,7 +405,7 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
         this.leaderId = tag.getInteger(Names.NBT.LEADER);
         this.ownerId = tag.getInteger(Names.NBT.OWNER);
         if(!this.getEntityWorld().isRemote) {
-            BoatLinker.getInstance().validateBoatLink(this);
+            this.validated = BoatLinker.getInstance().validateBoatLink(this);
         }
     }
 

@@ -185,12 +185,18 @@ public class BoatLinker implements IBoatLinker {
     }
 
     @Override
-    public IBoatLink getBoatLink(EntityBoat boat) {
+    public EntityBoatLink getBoatLink(EntityBoat boat) {
         return this.boatLinks.get(boat);
     }
 
-    public void validateBoatLink(EntityBoatLink link) {
-        this.boatLinks.put(link.getFollower(), link);
+    public boolean validateBoatLink(EntityBoatLink link) {
+        EntityBoat follower = link.getFollower();
+        if (follower == null) {
+            return false;
+        } else {
+            this.boatLinks.put(follower, link);
+            return true;
+        }
     }
 
     public void onBoatDeath(EntityBoat boat) {
