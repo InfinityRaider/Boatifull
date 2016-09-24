@@ -42,7 +42,7 @@ public class InteractionHandler {
             }
             ItemStack stack = player.inventory.getStackInSlot(player.inventory.currentItem);
             IBoatLinker boatLinker = BoatLinker.getInstance();
-            if(stack != null && stack.getItem() == boatLinker.getLinkKeyItem()) {
+            if(BoatLinker.getInstance().isValidLinkKey(stack)) {
                 EnumBoatLinkResult startResult = boatLinker.startBoatLink(player, boat);
                 if(!startResult.isOk()) {
                     EnumBoatLinkResult finishResult = boatLinker.finishBoatLink(player, boat);
@@ -79,7 +79,7 @@ public class InteractionHandler {
         }
         ItemStack stack = player.inventory.getStackInSlot(player.inventory.currentItem);
         IBoatLinker boatLinker = BoatLinker.getInstance();
-        if(stack != null && stack.getItem() == boatLinker.getLinkKeyItem() && boatLinker.cancelBoatLink(player)) {
+        if(boatLinker.isValidLinkKey(stack) && boatLinker.cancelBoatLink(player)) {
             player.addChatComponentMessage(new TextComponentTranslation("boatifull.message.cancel_link"));
         }
     }

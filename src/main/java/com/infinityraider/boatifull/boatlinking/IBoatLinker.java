@@ -3,6 +3,7 @@ package com.infinityraider.boatifull.boatlinking;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
 /**
  * Class to aid the linking of boats together,
@@ -14,6 +15,26 @@ public interface IBoatLinker {
      * @return the linking key item
      */
     Item getLinkKeyItem();
+
+    /**
+     * Gets the required metadata for te required item to link two boats together
+     * will return OreDictionary.WILDCARD_VALUE when metadata is fuzzy
+     *
+     * @return the linking key metadata
+     */
+    int getLinkKeyMeta();
+
+    /**
+     * @return a new ItemStack of the link key item
+     */
+    ItemStack getLinkKeyStack();
+
+    /**
+     * Checks if the stack is a valid link key
+     * @param stack stack to check
+     * @return true if the stack can be used to link boats
+     */
+    boolean isValidLinkKey(ItemStack stack);
 
     /**
      * Checks if a player can start a boat link, does not check if the player is holding the key item,

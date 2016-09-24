@@ -2,7 +2,6 @@ package com.infinityraider.boatifull.handler;
 
 import com.infinityraider.boatifull.boatlinking.BoatLinker;
 import com.mojang.realmsclient.gui.ChatFormatting;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -25,8 +24,7 @@ public class TooltipHandler {
     @SubscribeEvent(priority = LOWEST)
     @SuppressWarnings("unused")
     public void onToolTipEvent(ItemTooltipEvent event) {
-        ItemStack stack = event.getItemStack();
-        if(stack != null && stack.getItem() == BoatLinker.getInstance().getLinkKeyItem()) {
+        if(BoatLinker.getInstance().isValidLinkKey(event.getItemStack())) {
             event.getToolTip().add("");
             event.getToolTip().add(ChatFormatting.GRAY + I18n.translateToLocal("boatifull.tooltip.link_item"));
             if(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {

@@ -1,6 +1,7 @@
 package com.infinityraider.boatifull.boatlinking;
 
 import com.infinityraider.boatifull.entity.EntityBoatLink;
+import com.infinityraider.infinitylib.utility.LogHelper;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.*;
 
@@ -23,6 +25,7 @@ public class BoatLinker implements IBoatLinker {
     public static int LINK_RANGE = 3;
 
     private Item linkKeyItem;
+    private int linkKeyMeta;
 
     private final Map<EntityPlayer, EntityBoat> linkingPlayerToBoat;
     private final Map<EntityBoat, EntityPlayer> linkingBoatToPlayer;
@@ -31,6 +34,7 @@ public class BoatLinker implements IBoatLinker {
 
     private BoatLinker() {
         this.linkKeyItem = null;
+        this.linkKeyMeta = -1;
         this.linkingPlayerToBoat = new IdentityHashMap<>();
         this.linkingBoatToPlayer = new IdentityHashMap<>();
         this.boatLinks = new IdentityHashMap<>();
@@ -40,9 +44,32 @@ public class BoatLinker implements IBoatLinker {
     public Item getLinkKeyItem() {
         if(linkKeyItem == null) {
             //TODO: make configurable
-            linkKeyItem = Items.LEAD;
+            this.linkKeyItem = Items.LEAD;
+            LogHelper.debug("Set linking key item to " + Item.REGISTRY.getNameForObject(this.getLinkKeyItem()));
         }
-        return linkKeyItem;
+        return this.linkKeyItem;
+    }
+
+    @Override
+    public int getLinkKeyMeta() {
+        if(linkKeyMeta < 0) {
+            //TODO: make configurable
+            this.linkKeyMeta = 0;
+            LogHelper.debug("Set linking key meta to " + this.getLinkKeyMeta());
+        }
+        return this.linkKeyMeta;
+    }
+
+    @Override
+    public ItemStack getLinkKeyStack() {
+        return new ItemStack(this.getLinkKeyItem(), 1, this.getLinkKeyMeta() == OreDictionary.WILDCARD_VALUE ? 0 : this.getLinkKeyMeta());
+    }
+
+    @Override
+    public boolean isValidLinkKey(ItemStack stack) {
+        return stack != null
+                && stack.getItem() == this.getLinkKeyItem()
+                && (this.getLinkKeyMeta() == OreDictionary.WILDCARD_VALUE || stack.getItemDamage() == this.getLinkKeyMeta());
     }
 
     @Override
@@ -152,7 +179,7 @@ public class BoatLinker implements IBoatLinker {
             IBoatLink link = getBoatLink(follower);
             boatLinks.remove(follower);
             link.breakLink();
-            EntityItem item = new EntityItem(follower.getEntityWorld(), follower.posX, follower.posY, follower.posZ, new ItemStack(this.getLinkKeyItem()));
+            EntityItem item = new EntityItem(follower.getEntityWorld(), follower.posX, follower.posY, follower.posZ, this.getLinkKeyStack());
             follower.getEntityWorld().spawnEntityInWorld(item);
         } else {
             boatLinks.remove(follower);
