@@ -57,6 +57,15 @@ public class BoatLinker implements IBoatLinker {
     }
 
     @Override
+    public boolean cancelBoatLink(EntityPlayer player) {
+        if(linkingPlayerToBoat.containsKey(player)) {
+            removeLinkingProgress(player);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public EnumBoatLinkResult startBoatLink(EntityPlayer player, EntityBoat boat) {
         EnumBoatLinkResult result = canStartBoatLink(player, boat);
         if(result.isOk()) {
@@ -159,24 +168,9 @@ public class BoatLinker implements IBoatLinker {
         this.boatLinks.put(link.getFollower(), link);
     }
 
-    private void removeLinkingProgress(EntityBoat boat) {
-        if(linkingBoatToPlayer.containsKey(boat)) {
-            linkingPlayerToBoat.remove(linkingBoatToPlayer.get(boat));
-            linkingBoatToPlayer.remove(boat);
-        }
-    }
-
-    private void removeLinkingProgress(EntityPlayer player) {
-        if(linkingPlayerToBoat.containsKey(player)) {
-            linkingBoatToPlayer.remove(linkingPlayerToBoat.get(player));
-            linkingPlayerToBoat.remove(player);
-        }
-    }
-
     public void onBoatDeath(EntityBoat boat) {
         if(linkingBoatToPlayer.containsKey(boat)) {
-            linkingPlayerToBoat.remove(linkingBoatToPlayer.get(boat));
-            linkingBoatToPlayer.remove(boat);
+            removeLinkingProgress(boat);
         }
         if(this.boatLinks.containsKey(boat)) {
             this.unlinkBoat(boat);
@@ -193,6 +187,20 @@ public class BoatLinker implements IBoatLinker {
             }
         }
         linkedBoats.forEach(this::unlinkBoat);
+    }
+
+    private void removeLinkingProgress(EntityBoat boat) {
+        if(linkingBoatToPlayer.containsKey(boat)) {
+            linkingPlayerToBoat.remove(linkingBoatToPlayer.get(boat));
+            linkingBoatToPlayer.remove(boat);
+        }
+    }
+
+    private void removeLinkingProgress(EntityPlayer player) {
+        if(linkingPlayerToBoat.containsKey(player)) {
+            linkingBoatToPlayer.remove(linkingPlayerToBoat.get(player));
+            linkingPlayerToBoat.remove(player);
+        }
     }
 
     @SubscribeEvent

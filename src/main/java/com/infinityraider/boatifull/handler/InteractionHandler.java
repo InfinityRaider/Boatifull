@@ -69,4 +69,18 @@ public class InteractionHandler {
             event.setResult(Event.Result.DENY);
         }
     }
+
+    @SubscribeEvent(priority = HIGHEST)
+    @SuppressWarnings("unused")
+    public void onPlayerInteraction(PlayerInteractEvent.RightClickItem event) {
+        EntityPlayer player = event.getEntityPlayer();
+        if(player.getEntityWorld().isRemote || !player.isSneaking()) {
+            return;
+        }
+        ItemStack stack = player.inventory.getStackInSlot(player.inventory.currentItem);
+        IBoatLinker boatLinker = BoatLinker.getInstance();
+        if(stack != null && stack.getItem() == boatLinker.getLinkKeyItem() && boatLinker.cancelBoatLink(player)) {
+            player.addChatComponentMessage(new TextComponentTranslation("boatifull.message.cancel_link"));
+        }
+    }
 }

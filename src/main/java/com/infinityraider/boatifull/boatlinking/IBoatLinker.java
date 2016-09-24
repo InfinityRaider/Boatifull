@@ -26,6 +26,14 @@ public interface IBoatLinker {
     EnumBoatLinkResult canStartBoatLink(EntityPlayer player, EntityBoat boat);
 
     /**
+     * Cancels a currently active boat linking operation
+     *
+     * @param player the player
+     * @return true if a linking operation was successfully cancelled
+     */
+    boolean cancelBoatLink(EntityPlayer player);
+
+    /**
      * Performs the start of a boat link
      *
      * @param player player starting the link
