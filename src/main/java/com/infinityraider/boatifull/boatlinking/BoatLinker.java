@@ -1,11 +1,11 @@
 package com.infinityraider.boatifull.boatlinking;
 
 import com.infinityraider.boatifull.entity.EntityBoatLink;
+import com.infinityraider.boatifull.handler.ConfigurationHandler;
 import com.infinityraider.infinitylib.utility.LogHelper;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -43,9 +43,8 @@ public class BoatLinker implements IBoatLinker {
     @Override
     public Item getLinkKeyItem() {
         if(linkKeyItem == null) {
-            //TODO: make configurable
-            this.linkKeyItem = Items.LEAD;
-            LogHelper.debug("Set linking key item to " + Item.REGISTRY.getNameForObject(this.getLinkKeyItem()));
+            this.linkKeyItem = ConfigurationHandler.getInstance().getLinkKeyItem();
+            LogHelper.debug("Set linking key item to " + this.getLinkKeyItem().getRegistryName().toString());
         }
         return this.linkKeyItem;
     }
@@ -53,8 +52,7 @@ public class BoatLinker implements IBoatLinker {
     @Override
     public int getLinkKeyMeta() {
         if(linkKeyMeta < 0) {
-            //TODO: make configurable
-            this.linkKeyMeta = 0;
+            this.linkKeyMeta = ConfigurationHandler.getInstance().getLinkKeyMeta();
             LogHelper.debug("Set linking key meta to " + this.getLinkKeyMeta());
         }
         return this.linkKeyMeta;

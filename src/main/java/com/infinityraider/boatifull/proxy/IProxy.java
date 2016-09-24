@@ -14,7 +14,7 @@ public interface IProxy extends IProxyBase {
 
     @Override
     default void initConfiguration(FMLPreInitializationEvent event) {
-
+        ConfigurationHandler.getInstance().init(event);
     }
 
     @Override

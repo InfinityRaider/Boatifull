@@ -4,7 +4,6 @@ import com.infinityraider.boatifull.network.*;
 import com.infinityraider.boatifull.proxy.IProxy;
 import com.infinityraider.boatifull.reference.Reference;
 import com.infinityraider.boatifull.registry.EntityRegistry;
-import com.infinityraider.boatifull.registry.ItemRegistry;
 import com.infinityraider.infinitylib.InfinityMod;
 import com.infinityraider.infinitylib.network.INetworkWrapper;
 import net.minecraftforge.fml.common.Mod;
@@ -42,7 +41,7 @@ public class Boatifull extends InfinityMod {
 
     @Override
     public Object getModItemRegistry() {
-        return ItemRegistry.getInstance();
+        return this;
     }
 
     @Override
