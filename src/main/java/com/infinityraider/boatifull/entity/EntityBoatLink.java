@@ -85,6 +85,7 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
 
     public void mountFollower() {
         this.getFollower().startRiding(this);
+        this.setSize(this.getFollower().width, this.getFollower().height);
     }
 
     @Override

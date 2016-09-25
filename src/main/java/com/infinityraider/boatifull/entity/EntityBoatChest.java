@@ -40,11 +40,13 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
     public EntityBoatChest(World world) {
         super(world);
         this.inventory = new ItemStack[INVENTORY_SIZE];
+        this.setSize(1.375F, 0.8625F);
     }
 
     public EntityBoatChest(World world, double x, double y, double z) {
         super(world, x, y, z);
         this.inventory = new ItemStack[INVENTORY_SIZE];
+        this.setSize(1.375F, 0.8625F);
     }
 
     public EntityBoatChest(EntityBoat boat) {
