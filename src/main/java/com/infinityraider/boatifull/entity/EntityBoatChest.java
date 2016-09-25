@@ -8,13 +8,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.stats.StatList;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSourceIndirect;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
@@ -25,9 +26,14 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import javax.annotation.Nullable;
 
 public class EntityBoatChest extends EntityBoat implements IInventorySerializableItemHandler {
+    private static DataParameter<Integer> DATA_PLAYERS_USING = EntityDataManager.createKey(EntityBoatChest.class, DataSerializers.VARINT);
+
     private static final int INVENTORY_SIZE = 27;
 
     private ItemStack[] inventory;
+
+    private float lidAngle;
+    private float prevLidAngle;
 
     /** Constructor which is used to instantiate the entity client side or server side after a world reload using reflection */
     @SuppressWarnings("unused")
@@ -52,6 +58,45 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
         this.rotationPitch = boat.rotationPitch;
         this.rotationYaw = boat.rotationYaw;
         this.setBoatType(boat.getBoatType());
+    }
+
+    @Override
+    protected void entityInit() {
+        super.entityInit();
+        this.getDataManager().register(DATA_PLAYERS_USING, 0);
+    }
+
+    @Override
+    public void onUpdate() {
+        super.onUpdate();
+        this.updateLidAngle();
+    }
+
+    @SideOnly(Side.CLIENT)
+    protected void updateLidAngle() {
+        this.prevLidAngle = this.lidAngle;
+        int numPlayersUsing = this.getPlayersUsing();
+        if (numPlayersUsing > 0 && this.lidAngle == 0.0F) {
+            this.worldObj.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.BLOCK_CHEST_OPEN, SoundCategory.BLOCKS, 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+        }
+        if (numPlayersUsing == 0 && this.lidAngle > 0.0F || numPlayersUsing > 0 && this.lidAngle < 1.0F) {
+            float oldAngle = this.lidAngle;
+            if (numPlayersUsing > 0) {
+                this.lidAngle += 0.1F;
+            } else {
+                this.lidAngle -= 0.1F;
+            }
+            if (this.lidAngle > 1.0F) {
+                this.lidAngle = 1.0F;
+            }
+            float maxAngle = 0.5F;
+            if (this.lidAngle < maxAngle && oldAngle >= maxAngle) {
+                this.worldObj.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.BLOCK_CHEST_CLOSE, SoundCategory.BLOCKS, 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+            }
+            if (this.lidAngle < 0.0F) {
+                this.lidAngle = 0.0F;
+            }
+        }
     }
 
     /**
@@ -101,6 +146,23 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
             player.addStat(StatList.CHEST_OPENED);
         }
         return true;
+    }
+
+    public int getPlayersUsing() {
+        return this.getDataManager().get(DATA_PLAYERS_USING);
+    }
+
+    public void setPlayersUsing(int amount) {
+        amount = amount < 0 ? 0 : amount;
+        this.getDataManager().set(DATA_PLAYERS_USING, amount);
+    }
+
+    public float getLidAngle() {
+        return this.lidAngle;
+    }
+
+    public float getPrevLidAngle() {
+        return this.prevLidAngle;
     }
 
     @Override
@@ -191,9 +253,7 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
     }
 
     @Override
-    public void markDirty() {
-
-    }
+    public void markDirty() {}
 
     @Override
     public boolean isUseableByPlayer(EntityPlayer player) {
@@ -201,10 +261,22 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
     }
 
     @Override
-    public void openInventory(EntityPlayer player) {}
+    public void openInventory(EntityPlayer player) {
+        if(!this.worldObj.isRemote) {
+            int amount = this.getPlayersUsing();
+            amount = amount <= 0 ? 1 : amount + 1;
+            this.setPlayersUsing(amount);
+        }
+    }
 
     @Override
-    public void closeInventory(EntityPlayer player) {}
+    public void closeInventory(EntityPlayer player) {
+        if(!this.worldObj.isRemote) {
+            int amount = this.getPlayersUsing();
+            amount = amount <= 1 ? 0 : amount - 1;
+            this.setPlayersUsing(amount);
+        }
+    }
 
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {

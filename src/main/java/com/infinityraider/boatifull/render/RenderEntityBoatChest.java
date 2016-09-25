@@ -1,5 +1,6 @@
 package com.infinityraider.boatifull.render;
 
+import com.infinityraider.boatifull.Boatifull;
 import com.infinityraider.boatifull.entity.EntityBoatChest;
 import net.minecraft.client.model.IMultipassModel;
 import net.minecraft.client.model.ModelBase;
@@ -51,7 +52,7 @@ public class RenderEntityBoatChest extends Render<EntityBoatChest> {
         }
 
         this.model.render(entity, partialTicks, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
-        this.renderChest(partialTicks);
+        this.renderChest(entity, partialTicks);
 
         if (this.renderOutlines) {
             GlStateManager.disableOutlineMode();
@@ -62,7 +63,7 @@ public class RenderEntityBoatChest extends Render<EntityBoatChest> {
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
     }
 
-    public void renderChest(float partialTicks) {
+    public void renderChest(EntityBoatChest entity, float partialTicks) {
         TileEntitySpecialRenderer<TileEntityChest> renderer = TileEntityRendererDispatcher.instance.getSpecialRenderer(DUMMY_CHEST);
         if(renderer != null) {
             GlStateManager.pushMatrix();
@@ -71,6 +72,10 @@ public class RenderEntityBoatChest extends Render<EntityBoatChest> {
             GlStateManager.rotate(180, 1, 0, 0);
             GlStateManager.rotate(90, 0, 1, 0);
 
+            DUMMY_CHEST.numPlayersUsing = entity.getPlayersUsing();
+            DUMMY_CHEST.lidAngle = entity.getLidAngle();
+            DUMMY_CHEST.prevLidAngle = entity.getPrevLidAngle();
+            DUMMY_CHEST.setWorldObj(Boatifull.proxy.getClientWorld());
             renderer.renderTileEntityAt(DUMMY_CHEST, 0, 0, 0, partialTicks, -1);
 
             GlStateManager.popMatrix();
