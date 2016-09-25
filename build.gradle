@@ -22,7 +22,7 @@ plugins {
 */
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-version = "1.0"
+version = "0.1"
 group= "com.infinityraider.boatifull" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "boatifull"
 
