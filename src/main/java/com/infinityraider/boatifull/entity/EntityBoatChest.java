@@ -72,7 +72,6 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
         this.updateLidAngle();
     }
 
-    @SideOnly(Side.CLIENT)
     protected void updateLidAngle() {
         this.prevLidAngle = this.lidAngle;
         int numPlayersUsing = this.getPlayersUsing();
