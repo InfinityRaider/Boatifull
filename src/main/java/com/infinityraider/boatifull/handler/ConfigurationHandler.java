@@ -5,6 +5,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -22,6 +23,8 @@ public class ConfigurationHandler {
 
     private String linkKeyItemString;
     private int linkKeyMeta;
+
+    private boolean allowChestBoat;
 
     public void init(FMLPreInitializationEvent event) {
         if (config == null) {
@@ -43,9 +46,14 @@ public class ConfigurationHandler {
         return linkKeyMeta < 0 ? DEFAULT_LINK_META : this.linkKeyMeta;
     }
 
+    public boolean allowChestBoat() {
+        return this.allowChestBoat;
+    }
+
     private void loadConfiguration() {
         this.linkKeyItemString = config.getString("Link key item", Categories.GENERAL.getName(), DEFAULT_LINK_ITEM.getRegistryName().toString(), "The registry id for the link key item");
         this.linkKeyMeta = config.getInt("Link key meta", Categories.GENERAL.getName(), DEFAULT_LINK_META, 0, OreDictionary.WILDCARD_VALUE, "The metadata for the link key item, use " + OreDictionary.WILDCARD_VALUE + " for fuzzy metadata");
+        this.allowChestBoat = config.getBoolean("Enable chest boat", Categories.GENERAL.getName(), !Loader.isModLoaded("opentransport"), "Set to false to disable chest boats");
     }
 
     public enum Categories {

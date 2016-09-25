@@ -1,3 +1,6 @@
+//entity
+entity.boatifull.boatifull.entityBoatChest.name=Chest Boat
+
 //feedback messages
 boatifull.message.success_start=Boat link started
 boatifull.message.success_finish=Boat link finished
@@ -16,3 +19,4 @@ boatifull.tooltip.link_boat_second=Sneak right click a second boat to tie to the
 boatifull.tooltip.cancel_link=Sneak right click in the air to cancel a linking operation.
 boatifull.tooltip.link_info=A boat tied to another boat can no longer be controlled but will be pulled by the leading boat.
 boatifull.tooltip.more_info=(Hold shift for more information)
+boatifull.tooltip.create_chest_boat=Sneak right click on a boat to create a chest boat
