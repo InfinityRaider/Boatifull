@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ConfigurationHandler {
     private static final ConfigurationHandler INSTANCE = new ConfigurationHandler();
@@ -42,9 +43,9 @@ public class ConfigurationHandler {
     public List<ItemStack> getLinkKeyItems() {
         List<ItemStack> items = new ArrayList<>();
         for (String aLinkKeyItemString : linkKeyItemString) {
-            ItemStack item = ItemStackParser.parseItemStack(aLinkKeyItemString);
-            if (item != null) {
-                items.add(item);
+            Optional<ItemStack> item = ItemStackParser.parseItemStack(aLinkKeyItemString);
+            if (item.isPresent()) {
+                items.add(item.get());
             }
         }
         if(items.size() <= 0) {
