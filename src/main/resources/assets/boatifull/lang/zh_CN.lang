@@ -1,0 +1,22 @@
+﻿//entity
+entity.boatifull.boatifull.entityBoatChest.name=箱子船
+
+//feedback messages
+boatifull.message.success_start=船链接开始
+boatifull.message.success_finish=船链接完成
+boatifull.message.fail_too_far=你离船太远了
+boatifull.message.fail_already_has_leader=这个船已经被链接到一个主船上了
+boatifull.message.fail_link_loop=这样就会形成一个船只联接回路
+boatifull.message.fail_player_already_linking=玩家正在链接船
+boatifull.message.fail_boat_already_linking=这个船已经被链接
+boatifull.message.fail_not_linking=玩家没有链接船
+boatifull.message.cancel_link=链接取消
+
+//tooltip
+boatifull.tooltip.link_item=潜行的时候右键来链接船
+boatifull.tooltip.link_boat_first=潜行的时候右键来选择一个主船
+boatifull.tooltip.link_boat_second=潜行的时候右键第二个船来链接第一个船
+boatifull.tooltip.cancel_link=潜行对空气右键来取消链接
+boatifull.tooltip.link_info=当一个船被链接到主船上船将会无法控制
+boatifull.tooltip.more_info=(摁住shift获取更多信息)
+boatifull.tooltip.create_chest_boat=潜行的时候手持箱子右键船将创建一个箱子船
