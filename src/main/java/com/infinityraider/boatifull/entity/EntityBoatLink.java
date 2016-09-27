@@ -40,6 +40,7 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
     private EntityBoat owner;
     private int leaderId;
     private EntityBoat leader;
+    private ItemStack linkItem;
 
     private int outOfControlTicks;
     private double waterLevel;
@@ -56,12 +57,13 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
         this.setSize(1.375F, 0.5625F);
     }
 
-    public EntityBoatLink(EntityBoat leader, EntityBoat follower) {
+    public EntityBoatLink(EntityBoat leader, EntityBoat follower, ItemStack linkItem) {
         this(leader.getEntityWorld());
         this.ownerId = BoatIdProvider.getBoatId(follower);
         this.owner = follower;
         this.leaderId =  BoatIdProvider.getBoatId(leader);
         this.leader = leader;
+        this.linkItem = linkItem.copy();
         this.copyLocationAndAnglesFrom(follower);
     }
 
@@ -135,6 +137,11 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
     @Override
     public void breakLink() {
         this.setDead();
+    }
+
+    @Override
+    public ItemStack getLinkItem() {
+        return this.linkItem;
     }
 
     private void updateMotion() {
@@ -408,12 +415,20 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
         if(!this.getEntityWorld().isRemote) {
             this.validated = BoatLinker.getInstance().validateBoatLink(this);
         }
+        if(tag.hasKey(Names.NBT.STACK)) {
+            ItemStack stack = ItemStack.loadItemStackFromNBT(tag.getCompoundTag(Names.NBT.STACK));
+            this.linkItem = stack == null ? BoatLinker.getInstance().getDefaultKeyStack().copy() : stack;
+        } else {
+            this.linkItem = BoatLinker.getInstance().getDefaultKeyStack().copy();
+        }
     }
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound tag) {
         tag.setInteger(Names.NBT.LEADER, this.leaderId);
         tag.setInteger(Names.NBT.OWNER, this.ownerId);
+        NBTTagCompound stackTag = this.getLinkItem().writeToNBT(new NBTTagCompound());
+        tag.setTag(Names.NBT.STACK, stackTag);
     }
 
     @Override

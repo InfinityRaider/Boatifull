@@ -1,12 +1,12 @@
 package com.infinityraider.boatifull.boatlinking;
 
+import com.google.common.collect.ImmutableList;
 import com.infinityraider.boatifull.entity.EntityBoatLink;
 import com.infinityraider.boatifull.handler.ConfigurationHandler;
 import com.infinityraider.infinitylib.utility.LogHelper;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -24,8 +24,7 @@ public class BoatLinker implements IBoatLinker {
 
     public static int LINK_RANGE = 3;
 
-    private Item linkKeyItem;
-    private int linkKeyMeta;
+    private List<ItemStack> linkKeyItems;
 
     private final Map<EntityPlayer, EntityBoat> linkingPlayerToBoat;
     private final Map<EntityBoat, EntityPlayer> linkingBoatToPlayer;
@@ -33,41 +32,43 @@ public class BoatLinker implements IBoatLinker {
     private final Map<EntityBoat, EntityBoatLink> boatLinks;
 
     private BoatLinker() {
-        this.linkKeyItem = null;
-        this.linkKeyMeta = -1;
         this.linkingPlayerToBoat = new IdentityHashMap<>();
         this.linkingBoatToPlayer = new IdentityHashMap<>();
         this.boatLinks = new IdentityHashMap<>();
     }
 
     @Override
-    public Item getLinkKeyItem() {
-        if(linkKeyItem == null) {
-            this.linkKeyItem = ConfigurationHandler.getInstance().getLinkKeyItem();
-            LogHelper.debug("Set linking key item to " + this.getLinkKeyItem().getRegistryName().toString());
-        }
-        return this.linkKeyItem;
+    public ItemStack getDefaultKeyStack() {
+        return getLinkKeyStacks().get(0);
     }
 
     @Override
-    public int getLinkKeyMeta() {
-        if(linkKeyMeta < 0) {
-            this.linkKeyMeta = ConfigurationHandler.getInstance().getLinkKeyMeta();
-            LogHelper.debug("Set linking key meta to " + this.getLinkKeyMeta());
+    public List<ItemStack> getLinkKeyStacks() {
+        if(this.linkKeyItems == null) {
+            this.linkKeyItems = ImmutableList.copyOf(ConfigurationHandler.getInstance().getLinkKeyItems());
+            StringBuilder buffer = new StringBuilder();
+            buffer.append("Found boat linking items:");
+            for(ItemStack stack : this.linkKeyItems) {
+                buffer.append("\n").append(stack.getItem().getRegistryName().toString()).append(":").append(stack.getItemDamage());
+            }
+            LogHelper.debug(buffer.toString());
         }
-        return this.linkKeyMeta;
-    }
-
-    @Override
-    public ItemStack getLinkKeyStack() {
-        return new ItemStack(this.getLinkKeyItem(), 1, this.getLinkKeyMeta() == OreDictionary.WILDCARD_VALUE ? 0 : this.getLinkKeyMeta());
+        return this.linkKeyItems;
     }
 
     @Override
     public boolean isValidLinkKey(ItemStack stack) {
-        return stack != null
-                && stack.getItem() == this.getLinkKeyItem()
-                && (this.getLinkKeyMeta() == OreDictionary.WILDCARD_VALUE || stack.getItemDamage() == this.getLinkKeyMeta());
+        if(stack == null) {
+            return false;
+        }
+        for(ItemStack linkStack : this.getLinkKeyStacks()) {
+            if(linkStack.getItem() == stack.getItem()) {
+                if(linkStack.getItemDamage() == OreDictionary.WILDCARD_VALUE || linkStack.getItemDamage() == stack.getItemDamage()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -118,7 +119,7 @@ public class BoatLinker implements IBoatLinker {
             EntityBoat leader = linkingPlayerToBoat.get(player);
             linkingPlayerToBoat.remove(player);
             linkingBoatToPlayer.remove(leader);
-            result = linkBoats(leader, boat);
+            result = linkBoats(leader, boat, player.inventory.getCurrentItem());
         }
         return result;
     }
@@ -158,12 +159,12 @@ public class BoatLinker implements IBoatLinker {
     }
 
     @Override
-    public EnumBoatLinkResult linkBoats(EntityBoat leader, EntityBoat follower) {
+    public EnumBoatLinkResult linkBoats(EntityBoat leader, EntityBoat follower, ItemStack linkItem) {
         EnumBoatLinkResult result = canLinkBoats(leader, follower);
         if(result.isOk()) {
             removeLinkingProgress(leader);
             removeLinkingProgress(follower);
-            EntityBoatLink boatLink = new EntityBoatLink(leader, follower);
+            EntityBoatLink boatLink = new EntityBoatLink(leader, follower, linkItem);
             this.boatLinks.put(follower, boatLink);
             leader.getEntityWorld().spawnEntityInWorld(boatLink);
             boatLink.mountFollower();
@@ -177,7 +178,7 @@ public class BoatLinker implements IBoatLinker {
             IBoatLink link = getBoatLink(follower);
             boatLinks.remove(follower);
             link.breakLink();
-            EntityItem item = new EntityItem(follower.getEntityWorld(), follower.posX, follower.posY, follower.posZ, this.getLinkKeyStack());
+            EntityItem item = new EntityItem(follower.getEntityWorld(), follower.posX, follower.posY, follower.posZ, link.getLinkItem());
             follower.getEntityWorld().spawnEntityInWorld(item);
         } else {
             boatLinks.remove(follower);

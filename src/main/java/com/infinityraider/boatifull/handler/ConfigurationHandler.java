@@ -1,13 +1,16 @@
 package com.infinityraider.boatifull.handler;
 
 import com.infinityraider.infinitylib.utility.LogHelper;
+import com.infinityraider.infinitylib.utility.text.ItemStackParser;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.oredict.OreDictionary;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigurationHandler {
     private static final ConfigurationHandler INSTANCE = new ConfigurationHandler();
@@ -21,8 +24,7 @@ public class ConfigurationHandler {
 
     private Configuration config;
 
-    private String linkKeyItemString;
-    private int linkKeyMeta;
+    private String[] linkKeyItemString;
 
     private boolean allowChestBoat;
 
@@ -37,13 +39,18 @@ public class ConfigurationHandler {
         LogHelper.debug("Configuration Loaded");
     }
 
-    public Item getLinkKeyItem() {
-        Item item = Item.REGISTRY.getObject(new ResourceLocation(this.linkKeyItemString));
-        return item == null ? DEFAULT_LINK_ITEM : item;
-    }
-
-    public int getLinkKeyMeta() {
-        return linkKeyMeta < 0 ? DEFAULT_LINK_META : this.linkKeyMeta;
+    public List<ItemStack> getLinkKeyItems() {
+        List<ItemStack> items = new ArrayList<>();
+        for (String aLinkKeyItemString : linkKeyItemString) {
+            ItemStack item = ItemStackParser.parseItemStack(aLinkKeyItemString);
+            if (item != null) {
+                items.add(item);
+            }
+        }
+        if(items.size() <= 0) {
+            items.add(new ItemStack(DEFAULT_LINK_ITEM, 1, DEFAULT_LINK_META));
+        }
+        return items;
     }
 
     public boolean allowChestBoat() {
@@ -51,9 +58,12 @@ public class ConfigurationHandler {
     }
 
     private void loadConfiguration() {
-        this.linkKeyItemString = config.getString("Link key item", Categories.GENERAL.getName(), DEFAULT_LINK_ITEM.getRegistryName().toString(), "The registry id for the link key item");
-        this.linkKeyMeta = config.getInt("Link key meta", Categories.GENERAL.getName(), DEFAULT_LINK_META, 0, OreDictionary.WILDCARD_VALUE, "The metadata for the link key item, use " + OreDictionary.WILDCARD_VALUE + " for fuzzy metadata");
-        this.allowChestBoat = config.getBoolean("Enable chest boat", Categories.GENERAL.getName(), !Loader.isModLoaded("opentransport"), "Set to false to disable chest boats");
+        this.linkKeyItemString = config.getStringList("Link key items", Categories.GENERAL.getName(),
+                new String[] {DEFAULT_LINK_ITEM.getRegistryName().toString() + ":" + DEFAULT_LINK_META},
+                "A list of all items which can be used to link boats together, metadata is optional and will be fuzzy if not specified. The first entry will act as the default in case of error");
+        this.allowChestBoat = config.getBoolean("Enable chest boat", Categories.GENERAL.getName(),
+                !Loader.isModLoaded("opentransport"),
+                "Set to false to disable chest boats");
     }
 
     public enum Categories {

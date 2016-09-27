@@ -5,29 +5,22 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+import java.util.List;
+
 /**
  * Class to aid the linking of boats together,
  * by default boats are linked by the player by consecutively clicking first the leader boat and then the the following boat
  */
 public interface IBoatLinker {
     /**
-     * Gets the item required to link two boats together
-     * @return the linking key item
+     * @return The default key item stack, it is the first entry in the list returned by getLinkKeyStacks
      */
-    Item getLinkKeyItem();
+    ItemStack getDefaultKeyStack();
 
     /**
-     * Gets the required metadata for te required item to link two boats together
-     * will return OreDictionary.WILDCARD_VALUE when metadata is fuzzy
-     *
-     * @return the linking key metadata
+     * @return a list of all possible link items, will never be null and will always contain at least one element
      */
-    int getLinkKeyMeta();
-
-    /**
-     * @return a new ItemStack of the link key item
-     */
-    ItemStack getLinkKeyStack();
+    List<ItemStack> getLinkKeyStacks();
 
     /**
      * Checks if the stack is a valid link key
@@ -116,7 +109,7 @@ public interface IBoatLinker {
      * @param follower the follower boat in the link
      * @return boat link result
      */
-    EnumBoatLinkResult linkBoats(EntityBoat leader, EntityBoat follower);
+    EnumBoatLinkResult linkBoats(EntityBoat leader, EntityBoat follower, ItemStack linkItem);
 
     /**
      * Unlinks a follower from its leader
