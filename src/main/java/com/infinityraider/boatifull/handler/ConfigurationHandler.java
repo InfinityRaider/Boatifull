@@ -61,7 +61,8 @@ public class ConfigurationHandler {
     private void loadConfiguration() {
         this.linkKeyItemString = config.getStringList("Link key items", Categories.GENERAL.getName(),
                 new String[] {DEFAULT_LINK_ITEM.getRegistryName().toString() + ":" + DEFAULT_LINK_META},
-                "A list of all items which can be used to link boats together, metadata is optional and will be fuzzy if not specified. The first entry will act as the default in case of error");
+                "A list of all items which can be used to link boats together, metadata is optional and will be fuzzy if not specified.\n" +
+                "The first entry will act as the default in case of error");
         this.allowChestBoat = config.getBoolean("Enable chest boat", Categories.GENERAL.getName(),
                 !Loader.isModLoaded("opentransport"),
                 "Set to false to disable chest boats");
