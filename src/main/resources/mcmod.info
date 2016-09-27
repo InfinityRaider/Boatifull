@@ -1,12 +1,12 @@
 [
 	{
-		"modid": "infinitylib",
-		"name": "InfinityLib",
+		"modid": "boatifull",
+		"name": "Boatifull",
 
-		"version": "0.1",
+		"version": "0.2",
 		"mcversion": "1.10.2",
 
-		"logoFile": "assets/infinitylib/textures/logo.png",
+		"logoFile": "",
 		"screenshots": [],
 
 		"parent":"",
@@ -17,6 +17,6 @@
 
 		"url": "https://www.github.com/InfinityRaider",
 
-		"description": "Library mod for InfinityRaider's mods"
+		"description": "It's a boatifull life!"
 	}
 ]
