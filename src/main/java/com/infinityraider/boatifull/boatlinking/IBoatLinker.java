@@ -123,4 +123,11 @@ public interface IBoatLinker {
      * @return the boat link property object
      */
     IBoatLink getBoatLink(EntityBoat boat);
+
+    /**
+     * Gets a list of all boats linked to this boat
+     * @param boat the leading boat to get all linked boats for
+     * @return list with all linked boats, may be empty but will never be null
+     */
+    List<EntityBoat> getBoatsLinkedToBoat(EntityBoat boat);
 }

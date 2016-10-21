@@ -190,6 +190,22 @@ public class BoatLinker implements IBoatLinker {
         return this.boatLinks.get(boat);
     }
 
+    @Override
+    public List<EntityBoat> getBoatsLinkedToBoat(EntityBoat boat) {
+        Set<Map.Entry<EntityBoat, EntityBoatLink>> entrySet = boatLinks.entrySet();
+        Iterator<Map.Entry<EntityBoat, EntityBoatLink>> iterator = entrySet.iterator();
+        List<EntityBoat> linkedBoats = new ArrayList<>();
+        while(iterator.hasNext()) {
+            Map.Entry<EntityBoat, EntityBoatLink> entry = iterator.next();
+            if(entry.getValue() == null || entry.getKey() == null) {
+                iterator.remove();
+            } else if(entry.getValue().getLeader() == boat) {
+                linkedBoats.add(entry.getKey());
+            }
+        }
+        return linkedBoats;
+    }
+
     public boolean validateBoatLink(EntityBoatLink link) {
         EntityBoat follower = link.getFollower();
         if (follower == null) {
@@ -207,18 +223,7 @@ public class BoatLinker implements IBoatLinker {
         if(this.boatLinks.containsKey(boat)) {
             this.unlinkBoat(boat);
         }
-        Set<Map.Entry<EntityBoat, EntityBoatLink>> entrySet = boatLinks.entrySet();
-        Iterator<Map.Entry<EntityBoat, EntityBoatLink>> iterator = entrySet.iterator();
-        List<EntityBoat> linkedBoats = new ArrayList<>();
-        while(iterator.hasNext()) {
-            Map.Entry<EntityBoat, EntityBoatLink> entry = iterator.next();
-            if(entry.getValue() == null || entry.getKey() == null) {
-                iterator.remove();
-            } else if(entry.getValue().getLeader() == boat) {
-                linkedBoats.add(entry.getKey());
-            }
-        }
-        linkedBoats.forEach(this::unlinkBoat);
+        getBoatsLinkedToBoat(boat).forEach(this::unlinkBoat);
     }
 
     private void removeLinkingProgress(EntityBoat boat) {
