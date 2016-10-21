@@ -192,8 +192,7 @@ public class BoatLinker implements IBoatLinker {
 
     @Override
     public List<EntityBoat> getBoatsLinkedToBoat(EntityBoat boat) {
-        Set<Map.Entry<EntityBoat, EntityBoatLink>> entrySet = boatLinks.entrySet();
-        Iterator<Map.Entry<EntityBoat, EntityBoatLink>> iterator = entrySet.iterator();
+        Iterator<Map.Entry<EntityBoat, EntityBoatLink>> iterator = this.boatLinks.entrySet().iterator();
         List<EntityBoat> linkedBoats = new ArrayList<>();
         while(iterator.hasNext()) {
             Map.Entry<EntityBoat, EntityBoatLink> entry = iterator.next();
