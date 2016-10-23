@@ -1,12 +1,12 @@
 package com.infinityraider.boatifull.entity;
 
-import com.infinityraider.boatifull.boatlinking.BoatIdProvider;
+import com.infinityraider.boatifull.Boatifull;
 import com.infinityraider.boatifull.boatlinking.BoatLinker;
+import com.infinityraider.boatifull.boatlinking.CapabilityBoatId;
 import com.infinityraider.boatifull.boatlinking.IBoatLink;
 import com.infinityraider.boatifull.reference.Names;
 import com.infinityraider.boatifull.render.RenderBoatLink;
 import com.infinityraider.infinitylib.network.MessageSetEntityDead;
-import com.infinityraider.infinitylib.network.NetworkWrapper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
@@ -59,9 +59,9 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
 
     public EntityBoatLink(EntityBoat leader, EntityBoat follower, ItemStack linkItem) {
         this(leader.getEntityWorld());
-        this.ownerId = BoatIdProvider.getBoatId(follower);
+        this.ownerId = CapabilityBoatId.getBoatId(follower);
         this.owner = follower;
-        this.leaderId =  BoatIdProvider.getBoatId(leader);
+        this.leaderId =  CapabilityBoatId.getBoatId(leader);
         this.leader = leader;
         this.linkItem = linkItem.copy();
         this.copyLocationAndAnglesFrom(follower);
@@ -73,14 +73,14 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
     @Override
     public EntityBoat getFollower() {
         if(this.owner == null) {
-            this.owner = BoatIdProvider.getBoatFromId(this.ownerId);
+            this.owner = CapabilityBoatId.getBoatFromId(this.ownerId);
         }
         return owner;
     }
 
     public EntityBoat getLeader() {
         if(this.leader == null) {
-            this.leader = BoatIdProvider.getBoatFromId(this.leaderId);
+            this.leader = CapabilityBoatId.getBoatFromId(this.leaderId);
         }
         return leader;
     }
@@ -390,7 +390,7 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
     public void setDead() {
         if(!this.worldObj.isRemote) {
             BoatLinker.getInstance().unlinkBoat(this.getFollower());
-            NetworkWrapper.getInstance().sendToAll(new MessageSetEntityDead(this));
+            Boatifull.instance.getNetworkWrapper().sendToAll(new MessageSetEntityDead(this));
         }
         if(this.getFollower() != null) {
             this.getFollower().dismountRidingEntity();

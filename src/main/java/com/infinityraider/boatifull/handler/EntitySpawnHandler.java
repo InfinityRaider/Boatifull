@@ -1,7 +1,7 @@
 package com.infinityraider.boatifull.handler;
 
+import com.infinityraider.boatifull.Boatifull;
 import com.infinityraider.boatifull.network.MessageRequestBoatSync;
-import com.infinityraider.infinitylib.network.NetworkWrapper;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -22,7 +22,7 @@ public class EntitySpawnHandler {
     @SuppressWarnings("unused")
     public void onEntitySpawn(EntityJoinWorldEvent event) {
         if(event.getWorld().isRemote && event.getEntity() instanceof EntityBoat) {
-            NetworkWrapper.getInstance().sendToServer(new MessageRequestBoatSync((EntityBoat) event.getEntity()));
+            Boatifull.instance.getNetworkWrapper().sendToServer(new MessageRequestBoatSync((EntityBoat) event.getEntity()));
         }
     }
 }

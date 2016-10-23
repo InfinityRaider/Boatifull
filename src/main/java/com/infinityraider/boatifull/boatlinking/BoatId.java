@@ -1,9 +1,9 @@
 package com.infinityraider.boatifull.boatlinking;
 
 import com.google.common.primitives.Ints;
+import com.infinityraider.boatifull.Boatifull;
 import com.infinityraider.boatifull.network.MessageRequestBoatSync;
 import com.infinityraider.boatifull.reference.Names;
-import com.infinityraider.infinitylib.network.NetworkWrapper;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -28,7 +28,7 @@ public class BoatId implements IBoatId {
                 this.id = getNextId();
                 BOATS.put(this.getId(), this.getBoat());
             } else {
-                NetworkWrapper.getInstance().sendToServer(new MessageRequestBoatSync(this.owner));
+                Boatifull.instance.getNetworkWrapper().sendToServer(new MessageRequestBoatSync(this.owner));
             }
         }
         return this;
@@ -84,7 +84,7 @@ public class BoatId implements IBoatId {
 
     public static void onBoatRemoved(EntityBoat boat) {
         if(boat != null && !boat.getEntityWorld().isRemote) {
-            FREE_IDS.add(BoatIdProvider.getBoatId(boat));
+            FREE_IDS.add(CapabilityBoatId.getBoatId(boat));
         }
     }
 }

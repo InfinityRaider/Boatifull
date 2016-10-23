@@ -1,5 +1,6 @@
 package com.infinityraider.boatifull.boatlinking;
 
+import com.infinityraider.infinitylib.utility.ISerializable;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -7,7 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
  * This is necessary for persistent boat links between server restarts
  * Boats seem to change entity id when the server restarts, this adds a fixed id to all boats in order to identify each boat
  */
-public interface IBoatId {
+public interface IBoatId extends ISerializable {
     /**
      * sets the boat of which this is the property,
      * internal use only, do not call this method

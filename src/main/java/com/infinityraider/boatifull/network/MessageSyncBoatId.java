@@ -1,6 +1,6 @@
 package com.infinityraider.boatifull.network;
 
-import com.infinityraider.boatifull.boatlinking.BoatIdProvider;
+import com.infinityraider.boatifull.boatlinking.CapabilityBoatId;
 import com.infinityraider.boatifull.boatlinking.IBoatId;
 import com.infinityraider.infinitylib.network.MessageBase;
 import io.netty.buffer.ByteBuf;
@@ -23,7 +23,7 @@ public class MessageSyncBoatId extends MessageBase<IMessage> {
     public MessageSyncBoatId(EntityBoat boat) {
         this();
         this.boat = boat;
-        IBoatId boatId = BoatIdProvider.getBoatIdData(boat);
+        IBoatId boatId = CapabilityBoatId.getBoatIdData(boat);
         this.data = boatId == null ? null : boatId.writeToNBT();
     }
 
@@ -35,7 +35,7 @@ public class MessageSyncBoatId extends MessageBase<IMessage> {
     @Override
     protected void processMessage(MessageContext ctx) {
         if(ctx.side == Side.CLIENT && this.boat != null && this.data != null) {
-            IBoatId boatId = BoatIdProvider.getBoatIdData(this.boat);
+            IBoatId boatId = CapabilityBoatId.getBoatIdData(this.boat);
             if(boatId != null) {
                 boatId.readFromNBT(this.data);
             }

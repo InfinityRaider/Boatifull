@@ -1,12 +1,12 @@
 package com.infinityraider.boatifull.handler;
 
+import com.infinityraider.boatifull.Boatifull;
 import com.infinityraider.boatifull.boatlinking.BoatLinker;
 import com.infinityraider.boatifull.boatlinking.EnumBoatLinkResult;
 import com.infinityraider.boatifull.boatlinking.IBoatLinker;
 import com.infinityraider.boatifull.entity.EntityBoatChest;
 import com.infinityraider.boatifull.entity.EntityBoatLink;
 import com.infinityraider.infinitylib.network.MessageSetEntityDead;
-import com.infinityraider.infinitylib.network.NetworkWrapper;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -81,7 +81,7 @@ public class InteractionHandler {
         World world = boat.getEntityWorld();
         EntityBoatChest chestBoat = new EntityBoatChest(boat);
         boat.setDead();
-        NetworkWrapper.getInstance().sendToAll(new MessageSetEntityDead(boat));
+        Boatifull.instance.getNetworkWrapper().sendToAll(new MessageSetEntityDead(boat));
         world.spawnEntityInWorld(chestBoat);
         this.reduceStackSize(player, stack);
     }

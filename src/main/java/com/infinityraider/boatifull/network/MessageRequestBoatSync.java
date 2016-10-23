@@ -1,7 +1,7 @@
 package com.infinityraider.boatifull.network;
 
+import com.infinityraider.boatifull.Boatifull;
 import com.infinityraider.infinitylib.network.MessageBase;
-import com.infinityraider.infinitylib.network.NetworkWrapper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityBoat;
@@ -29,7 +29,7 @@ public class MessageRequestBoatSync extends MessageBase<IMessage> {
     @Override
     protected void processMessage(MessageContext ctx) {
         if(ctx.side == Side.SERVER && this.boat != null) {
-            NetworkWrapper.getInstance().sendTo(new MessageSyncBoatId(this.boat), ctx.getServerHandler().playerEntity);
+            Boatifull.instance.getNetworkWrapper().sendTo(new MessageSyncBoatId(this.boat), ctx.getServerHandler().playerEntity);
         }
     }
 
