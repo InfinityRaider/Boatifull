@@ -1,6 +1,6 @@
 package com.infinityraider.boatifull.handler;
 
-import com.infinityraider.infinitylib.utility.LogHelper;
+import com.infinityraider.boatifull.Boatifull;
 import com.infinityraider.infinitylib.utility.text.ItemStackParser;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -37,7 +37,7 @@ public class ConfigurationHandler {
         if (config.hasChanged()) {
             config.save();
         }
-        LogHelper.debug("Configuration Loaded");
+        Boatifull.instance.getLogger().debug("Configuration Loaded");
     }
 
     public List<ItemStack> getLinkKeyItems() {

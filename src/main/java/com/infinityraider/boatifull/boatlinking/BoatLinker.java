@@ -1,9 +1,9 @@
 package com.infinityraider.boatifull.boatlinking;
 
 import com.google.common.collect.ImmutableList;
+import com.infinityraider.boatifull.Boatifull;
 import com.infinityraider.boatifull.entity.EntityBoatLink;
 import com.infinityraider.boatifull.handler.ConfigurationHandler;
-import com.infinityraider.infinitylib.utility.LogHelper;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -51,7 +51,7 @@ public class BoatLinker implements IBoatLinker {
             for(ItemStack stack : this.linkKeyItems) {
                 buffer.append("\n").append(stack.getItem().getRegistryName().toString()).append(":").append(stack.getItemDamage());
             }
-            LogHelper.debug(buffer.toString());
+            Boatifull.instance.getLogger().debug(buffer.toString());
         }
         return this.linkKeyItems;
     }
