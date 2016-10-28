@@ -8,7 +8,6 @@ import com.infinityraider.infinitylib.InfinityMod;
 import com.infinityraider.infinitylib.network.INetworkWrapper;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
 
 @Mod(
         modid = Reference.MOD_ID,
@@ -53,29 +52,5 @@ public class Boatifull extends InfinityMod {
     public void registerMessages(INetworkWrapper wrapper) {
         wrapper.registerMessage(MessageRequestBoatSync.class);
         wrapper.registerMessage(MessageSyncBoatId.class);
-    }
-
-    @Mod.EventHandler
-    @SuppressWarnings("unused")
-    public void preInitMod(FMLPreInitializationEvent event) {
-        super.preInit(event);
-    }
-
-    @Mod.EventHandler
-    @SuppressWarnings("unused")
-    public void initMod(FMLInitializationEvent event) {
-        super.init(event);
-    }
-
-    @Mod.EventHandler
-    @SuppressWarnings("unused")
-    public void postInitMod(FMLPostInitializationEvent event) {
-        super.postInit(event);
-    }
-
-    @Mod.EventHandler
-    @SuppressWarnings("unused")
-    public void serverAboutToStart(FMLServerAboutToStartEvent event) {
-        super.onServerAboutToStart(event);
     }
 }
