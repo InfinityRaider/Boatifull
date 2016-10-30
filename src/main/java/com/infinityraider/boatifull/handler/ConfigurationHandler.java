@@ -8,6 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,16 @@ public class ConfigurationHandler {
 
     private String[] linkKeyItemString;
 
+    //chest boat
     private boolean allowChestBoat;
+
+    //tooltips
+    @SideOnly(Side.CLIENT)
+    public boolean tooltipOnLinkItems;
+    @SideOnly(Side.CLIENT)
+    public boolean tooltipOnChests;
+    @SideOnly(Side.CLIENT)
+    public boolean tooltipOnBoats;
 
     public void init(FMLPreInitializationEvent event) {
         if (config == null) {
@@ -38,6 +49,17 @@ public class ConfigurationHandler {
             config.save();
         }
         Boatifull.instance.getLogger().debug("Configuration Loaded");
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void initClient(FMLPreInitializationEvent event) {
+        if (config == null) {
+            config = new Configuration(event.getSuggestedConfigurationFile());
+        }
+        loadClientConfiguration();
+        if (config.hasChanged()) {
+            config.save();
+        }
     }
 
     public List<ItemStack> getLinkKeyItems() {
@@ -68,8 +90,19 @@ public class ConfigurationHandler {
                 "Set to false to disable chest boats");
     }
 
+    @SideOnly(Side.CLIENT)
+    private void loadClientConfiguration() {
+        tooltipOnLinkItems = config.getBoolean("link items", Categories.CLIENT.getName(), true,
+                "set to false to not show tooltips on link items");
+        tooltipOnLinkItems = config.getBoolean("chests", Categories.CLIENT.getName(), true,
+                "set to false to not show tooltips on chests");
+        tooltipOnBoats = config.getBoolean("boats", Categories.CLIENT.getName(), false,
+                "set to true to show tooltips on boats");
+    }
+
     public enum Categories {
-        GENERAL("general");
+        GENERAL("general"),
+        CLIENT("client");
 
         private final String name;
 

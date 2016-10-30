@@ -3,6 +3,7 @@ Changelog
 0.2
 - ADDED: Multiple boat linking items
 - ADDED: Chinese localization (euBykuyaRinne)
+- ADDED: Config options to disable tooltips
 
 0.1
 - Initial build

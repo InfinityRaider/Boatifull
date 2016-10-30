@@ -20,3 +20,5 @@ boatifull.tooltip.cancel_link=Sneak right click in the air to cancel a linking o
 boatifull.tooltip.link_info=A boat tied to another boat can no longer be controlled but will be pulled by the leading boat.
 boatifull.tooltip.more_info=(Hold shift for more information)
 boatifull.tooltip.create_chest_boat=Sneak right click on a boat to create a chest boat
+boatifull.tooltip.link_boats=Boats can be linked together
+boatifull.tooltip.linking_items=The linking items are:
