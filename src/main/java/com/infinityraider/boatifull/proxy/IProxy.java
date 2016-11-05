@@ -3,7 +3,6 @@ package com.infinityraider.boatifull.proxy;
 import com.infinityraider.boatifull.boatlinking.*;
 import com.infinityraider.boatifull.handler.*;
 import com.infinityraider.infinitylib.proxy.base.IProxyBase;
-import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.event.*;
 
 public interface IProxy extends IProxyBase {

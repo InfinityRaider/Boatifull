@@ -1,6 +1,5 @@
 package com.infinityraider.boatifull.handler;
 
-import com.infinityraider.boatifull.Boatifull;
 import com.infinityraider.boatifull.boatlinking.BoatLinker;
 import com.infinityraider.boatifull.boatlinking.EnumBoatLinkResult;
 import com.infinityraider.boatifull.boatlinking.IBoatLinker;
@@ -81,7 +80,7 @@ public class InteractionHandler {
         World world = boat.getEntityWorld();
         EntityBoatChest chestBoat = new EntityBoatChest(boat);
         boat.setDead();
-        Boatifull.instance.getNetworkWrapper().sendToAll(new MessageSetEntityDead(boat));
+        new MessageSetEntityDead(boat).sendToAll();
         world.spawnEntityInWorld(chestBoat);
         this.reduceStackSize(player, stack);
     }

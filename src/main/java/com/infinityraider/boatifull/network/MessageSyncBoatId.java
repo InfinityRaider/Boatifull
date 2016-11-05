@@ -3,11 +3,8 @@ package com.infinityraider.boatifull.network;
 import com.infinityraider.boatifull.boatlinking.CapabilityBoatId;
 import com.infinityraider.boatifull.boatlinking.IBoatId;
 import com.infinityraider.infinitylib.network.MessageBase;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -45,25 +42,5 @@ public class MessageSyncBoatId extends MessageBase<IMessage> {
     @Override
     protected IMessage getReply(MessageContext ctx) {
         return null;
-    }
-
-    @Override
-    public void fromBytes(ByteBuf buf) {
-        Entity entity = this.readEntityFromByteBuf(buf);
-        if(entity instanceof EntityBoat) {
-            this.boat = (EntityBoat) entity;
-        }
-        if(buf.readBoolean()) {
-            this.data = ByteBufUtils.readTag(buf);
-        }
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf) {
-        this.writeEntityToByteBuf(buf, this.boat);
-        buf.writeBoolean(this.data != null);
-        if(this.data != null) {
-            ByteBufUtils.writeTag(buf, this.data);
-        }
     }
 }

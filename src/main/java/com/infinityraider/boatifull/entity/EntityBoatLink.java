@@ -1,6 +1,5 @@
 package com.infinityraider.boatifull.entity;
 
-import com.infinityraider.boatifull.Boatifull;
 import com.infinityraider.boatifull.boatlinking.BoatLinker;
 import com.infinityraider.boatifull.boatlinking.CapabilityBoatId;
 import com.infinityraider.boatifull.boatlinking.IBoatLink;
@@ -390,7 +389,7 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
     public void setDead() {
         if(!this.worldObj.isRemote) {
             BoatLinker.getInstance().unlinkBoat(this.getFollower());
-            Boatifull.instance.getNetworkWrapper().sendToAll(new MessageSetEntityDead(this));
+            new MessageSetEntityDead(this).sendToAll();
         }
         if(this.getFollower() != null) {
             this.getFollower().dismountRidingEntity();

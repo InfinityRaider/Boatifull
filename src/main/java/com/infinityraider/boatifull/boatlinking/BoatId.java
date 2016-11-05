@@ -1,7 +1,6 @@
 package com.infinityraider.boatifull.boatlinking;
 
 import com.google.common.primitives.Ints;
-import com.infinityraider.boatifull.Boatifull;
 import com.infinityraider.boatifull.network.MessageRequestBoatSync;
 import com.infinityraider.boatifull.reference.Names;
 import net.minecraft.entity.item.EntityBoat;
@@ -28,7 +27,7 @@ public class BoatId implements IBoatId {
                 this.id = getNextId();
                 BOATS.put(this.getId(), this.getBoat());
             } else {
-                Boatifull.instance.getNetworkWrapper().sendToServer(new MessageRequestBoatSync(this.owner));
+                new MessageRequestBoatSync(this.owner).sendToServer();
             }
         }
         return this;
