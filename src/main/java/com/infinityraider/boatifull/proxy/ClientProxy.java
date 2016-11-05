@@ -20,5 +20,6 @@ public class ClientProxy implements IProxy, IClientProxyBase {
         IProxy.super.registerEventHandlers();
         this.registerEventHandler(EntitySpawnHandler.getInstance());
         this.registerEventHandler(TooltipHandler.getInstance());
+        this.registerEventHandler(BoatDismountHandler.getInstance());
     }
 }

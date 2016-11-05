@@ -4,6 +4,9 @@ import com.google.common.collect.ImmutableList;
 import com.infinityraider.boatifull.Boatifull;
 import com.infinityraider.boatifull.entity.EntityBoatLink;
 import com.infinityraider.boatifull.handler.ConfigurationHandler;
+import com.infinityraider.infinitylib.modules.entitylistener.IEntityLeaveOrJoinWorldListener;
+import com.infinityraider.infinitylib.modules.entitylistener.ModuleEntityListener;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,7 +18,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.*;
 
-public class BoatLinker implements IBoatLinker {
+public class BoatLinker implements IBoatLinker, IEntityLeaveOrJoinWorldListener {
     private static final BoatLinker INSTANCE = new BoatLinker();
 
     public static BoatLinker getInstance() {
@@ -35,6 +38,7 @@ public class BoatLinker implements IBoatLinker {
         this.linkingPlayerToBoat = new IdentityHashMap<>();
         this.linkingBoatToPlayer = new IdentityHashMap<>();
         this.boatLinks = new IdentityHashMap<>();
+        ModuleEntityListener.getInstance().registerListener(this);
     }
 
     @Override
@@ -215,16 +219,6 @@ public class BoatLinker implements IBoatLinker {
         }
     }
 
-    public void onBoatDeath(EntityBoat boat) {
-        if(linkingBoatToPlayer.containsKey(boat)) {
-            removeLinkingProgress(boat);
-        }
-        if(this.boatLinks.containsKey(boat)) {
-            this.unlinkBoat(boat);
-        }
-        getBoatsLinkedToBoat(boat).forEach(this::unlinkBoat);
-    }
-
     private void removeLinkingProgress(EntityBoat boat) {
         if(linkingBoatToPlayer.containsKey(boat)) {
             linkingPlayerToBoat.remove(linkingBoatToPlayer.get(boat));
@@ -252,6 +246,27 @@ public class BoatLinker implements IBoatLinker {
     public void onPlayerDisconnect(PlayerEvent.PlayerLoggedOutEvent event) {
         if(!event.player.getEntityWorld().isRemote) {
             removeLinkingProgress(event.player);
+        }
+    }
+
+    @Override
+    public void onEntityJoinWorld(Entity entity) {}
+
+    @Override
+    public void onEntityLeaveWorld(Entity entity) {
+        if(!entity.getEntityWorld().isRemote) {
+            if(entity instanceof EntityBoat) {
+                EntityBoat boat = (EntityBoat) entity;
+                if(linkingBoatToPlayer.containsKey(boat)) {
+                    removeLinkingProgress(boat);
+                }
+                if(this.boatLinks.containsKey(boat)) {
+                    this.unlinkBoat(boat);
+                }
+                getBoatsLinkedToBoat(boat).forEach(this::unlinkBoat);
+            } else if(entity instanceof EntityPlayer) {
+                this.removeLinkingProgress((EntityPlayer) entity);
+            }
         }
     }
 }

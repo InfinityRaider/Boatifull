@@ -1,5 +1,9 @@
 Changelog
 ---------
+0.3
+- ADDED: Players will now stand on top of the boat after dismounting instead of ending up in water
+- FIXED: Not being able to link non-vanilla boats anymore
+
 0.2
 - ADDED: Multiple boat linking items
 - ADDED: Chinese localization (euBykuyaRinne)
