@@ -62,7 +62,7 @@ public class BoatLinker implements IBoatLinker, IEntityLeaveOrJoinWorldListener 
 
     @Override
     public boolean isValidLinkKey(ItemStack stack) {
-        if(stack == null) {
+        if(stack.isEmpty()) {
             return false;
         }
         for(ItemStack linkStack : this.getLinkKeyStacks()) {
