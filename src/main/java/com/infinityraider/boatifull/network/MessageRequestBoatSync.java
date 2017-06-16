@@ -26,7 +26,7 @@ public class MessageRequestBoatSync extends MessageBase<IMessage> {
     @Override
     protected void processMessage(MessageContext ctx) {
         if(ctx.side == Side.SERVER && this.boat != null) {
-            new MessageSyncBoatId(this.boat).sendTo(ctx.getServerHandler().playerEntity);
+            new MessageSyncBoatId(this.boat).sendTo(ctx.getServerHandler().player);
         }
     }
 

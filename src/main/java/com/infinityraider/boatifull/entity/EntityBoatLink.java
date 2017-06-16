@@ -13,6 +13,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -31,7 +32,9 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 public class EntityBoatLink extends Entity implements IBoatLink, IEntityAdditionalSpawnData {
@@ -144,7 +147,7 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
     }
 
     private void updateMotion() {
-        double vY = this.func_189652_ae() ? 0.0D : -0.03999999910593033D;
+        double vY = this.hasNoGravity() ? 0.0D : -0.03999999910593033D;
         double vZ = 0.0D;
         float momentum = 0.05F;
 
@@ -219,7 +222,7 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
         if(!this.validated) {
             this.validated = BoatLinker.getInstance().validateBoatLink(this);
         }
-        if(!this.worldObj.isRemote && this.getFollower() == null && this.validated) {
+        if(!this.getEntityWorld().isRemote && this.getFollower() == null && this.validated) {
             this.setDead();
             return;
         }
@@ -233,7 +236,7 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
             ++this.outOfControlTicks;
         }
 
-        if (!this.worldObj.isRemote && this.outOfControlTicks >= 60) {
+        if (!this.getEntityWorld().isRemote && this.outOfControlTicks >= 60) {
             this.breakLink();
         }
 
@@ -245,12 +248,12 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
 
         if(!this.getEntityWorld().isRemote) {
             this.updateMotion();
-            this.moveEntity(this.motionX, this.motionY, this.motionZ);
+            this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
         }
 
         this.doBlockCollisions();
 
-        List<Entity> list = this.worldObj.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox().expand(0.20000000298023224D, -0.009999999776482582D, 0.20000000298023224D), EntitySelectors.getTeamCollisionPredicate(this));
+        List<Entity> list = this.getEntityWorld().getEntitiesInAABBexcluding(this, this.getEntityBoundingBox().expand(0.20000000298023224D, -0.009999999776482582D, 0.20000000298023224D), EntitySelectors.getTeamCollisionPredicate(this));
         if (!list.isEmpty()) {
             list.stream().filter(entity -> !entity.isPassenger(this)).forEach(this::applyEntityCollision);
         }
@@ -281,12 +284,12 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
 
     private boolean checkInWater() {
         AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
-        int xMin = MathHelper.floor_double(axisalignedbb.minX);
-        int xMax = MathHelper.ceiling_double_int(axisalignedbb.maxX);
-        int yMin = MathHelper.floor_double(axisalignedbb.minY);
-        int yMax = MathHelper.ceiling_double_int(axisalignedbb.minY + 0.001D);
-        int zMin = MathHelper.floor_double(axisalignedbb.minZ);
-        int zMax = MathHelper.ceiling_double_int(axisalignedbb.maxZ);
+        int xMin = MathHelper.floor(axisalignedbb.minX);
+        int xMax = MathHelper.ceil(axisalignedbb.maxX);
+        int yMin = MathHelper.floor(axisalignedbb.minY);
+        int yMax = MathHelper.ceil(axisalignedbb.minY + 0.001D);
+        int zMin = MathHelper.floor(axisalignedbb.minZ);
+        int zMax = MathHelper.ceil(axisalignedbb.maxZ);
         boolean flag = false;
         this.waterLevel = Double.MIN_VALUE;
         BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain();
@@ -295,9 +298,9 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
                 for (int y = yMin; y < yMax; ++y) {
                     for (int z = zMin; z < zMax; ++z) {
                         pos.setPos(x, y, z);
-                        IBlockState iblockstate = this.worldObj.getBlockState(pos);
+                        IBlockState iblockstate = this.getEntityWorld().getBlockState(pos);
                         if (iblockstate.getMaterial() == Material.WATER) {
-                            float f = EntityBoat.getLiquidHeight(iblockstate, this.worldObj, pos);
+                            float f = BlockLiquid.getLiquidHeight(iblockstate, this.getEntityWorld(), pos);
                             this.waterLevel = Math.max((double)f, this.waterLevel);
                             flag |= axisalignedbb.minY < (double)f;
                         }
@@ -313,12 +316,12 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
 
     private float getWaterLevelAbove() {
         AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
-        int xMin = MathHelper.floor_double(axisalignedbb.minX);
-        int xMax = MathHelper.ceiling_double_int(axisalignedbb.maxX);
-        int yMin = MathHelper.floor_double(axisalignedbb.maxY);
-        int yMax = MathHelper.ceiling_double_int(axisalignedbb.maxY - this.lastYd);
-        int zMin = MathHelper.floor_double(axisalignedbb.minZ);
-        int zMax = MathHelper.ceiling_double_int(axisalignedbb.maxZ);
+        int xMin = MathHelper.floor(axisalignedbb.minX);
+        int xMax = MathHelper.ceil(axisalignedbb.maxX);
+        int yMin = MathHelper.floor(axisalignedbb.maxY);
+        int yMax = MathHelper.ceil(axisalignedbb.maxY - this.lastYd);
+        int zMin = MathHelper.floor(axisalignedbb.minZ);
+        int zMax = MathHelper.ceil(axisalignedbb.maxZ);
         BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain();
         try {
             label:
@@ -334,9 +337,9 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
                     }
                     for (int z = zMin; z < zMax; ++z) {
                         pos.setPos(x, y, z);
-                        IBlockState iblockstate = this.worldObj.getBlockState(pos);
+                        IBlockState iblockstate = this.getEntityWorld().getBlockState(pos);
                         if (iblockstate.getMaterial() == Material.WATER) {
-                            f = Math.max(f, EntityBoat.getBlockLiquidHeight(iblockstate, this.worldObj, pos));
+                            f = Math.max(f, BlockLiquid.getBlockLiquidHeight(iblockstate, this.getEntityWorld(), pos));
                         }
                         if (f >= 1.0F) {
                             continue label;
@@ -356,12 +359,12 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
     private EntityBoat.Status getUnderwaterStatus() {
         AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
         double yTop = axisalignedbb.maxY + 0.001D;
-        int xMin = MathHelper.floor_double(axisalignedbb.minX);
-        int xMax = MathHelper.ceiling_double_int(axisalignedbb.maxX);
-        int yMin = MathHelper.floor_double(axisalignedbb.maxY);
-        int yMax = MathHelper.ceiling_double_int(yTop);
-        int zMin = MathHelper.floor_double(axisalignedbb.minZ);
-        int zMax = MathHelper.ceiling_double_int(axisalignedbb.maxZ);
+        int xMin = MathHelper.floor(axisalignedbb.minX);
+        int xMax = MathHelper.ceil(axisalignedbb.maxX);
+        int yMin = MathHelper.floor(axisalignedbb.maxY);
+        int yMax = MathHelper.ceil(yTop);
+        int zMin = MathHelper.floor(axisalignedbb.minZ);
+        int zMax = MathHelper.ceil(axisalignedbb.maxZ);
         boolean flag = false;
         BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain();
         try {
@@ -369,8 +372,8 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
                 for (int y = yMin; y < yMax; ++y) {
                     for (int z = zMin; z < zMax; ++z) {
                         pos.setPos(x, y, z);
-                        IBlockState iblockstate = this.worldObj.getBlockState(pos);
-                        if (iblockstate.getMaterial() == Material.WATER && yTop < (double) EntityBoat.getLiquidHeight(iblockstate, this.worldObj, pos)) {
+                        IBlockState iblockstate = this.getEntityWorld().getBlockState(pos);
+                        if (iblockstate.getMaterial() == Material.WATER && yTop < (double) BlockLiquid.getLiquidHeight(iblockstate, this.getEntityWorld(), pos)) {
                             if (iblockstate.getValue(BlockLiquid.LEVEL) != 0) {
                                 return EntityBoat.Status.UNDER_FLOWING_WATER;
                             }
@@ -387,7 +390,7 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
 
     @Override
     public void setDead() {
-        if(!this.worldObj.isRemote) {
+        if(!this.getEntityWorld().isRemote) {
             BoatLinker.getInstance().unlinkBoat(this.getFollower());
             new MessageSetEntityDead(this).sendToAll();
         }
@@ -398,25 +401,26 @@ public class EntityBoatLink extends Entity implements IBoatLink, IEntityAddition
     }
 
     @Override
-    public boolean attackEntityFrom(DamageSource source, float amount) {
+    public boolean attackEntityFrom(@Nonnull DamageSource source, float amount) {
         return this.getFollower() != null && this.getFollower().attackEntityFrom(source, amount);
     }
 
     @Override
-    public boolean processInitialInteract(EntityPlayer player, @Nullable ItemStack stack, EnumHand hand) {
-        return this.getFollower() == null || this.getFollower().processInitialInteract(player, stack, hand);
+    @ParametersAreNonnullByDefault
+    public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
+        return this.getFollower() == null || this.getFollower().processInitialInteract(player, hand);
     }
 
     @Override
-    protected void readEntityFromNBT(NBTTagCompound tag) {
+    protected void readEntityFromNBT(@Nonnull NBTTagCompound tag) {
         this.leaderId = tag.getInteger(Names.NBT.LEADER);
         this.ownerId = tag.getInteger(Names.NBT.OWNER);
         if(!this.getEntityWorld().isRemote) {
             this.validated = BoatLinker.getInstance().validateBoatLink(this);
         }
         if(tag.hasKey(Names.NBT.STACK)) {
-            ItemStack stack = ItemStack.loadItemStackFromNBT(tag.getCompoundTag(Names.NBT.STACK));
-            this.linkItem = stack == null ? BoatLinker.getInstance().getDefaultKeyStack().copy() : stack;
+            ItemStack stack = new ItemStack(tag.getCompoundTag(Names.NBT.STACK));
+            this.linkItem = stack.isEmpty() ? BoatLinker.getInstance().getDefaultKeyStack().copy() : stack;
         } else {
             this.linkItem = BoatLinker.getInstance().getDefaultKeyStack().copy();
         }

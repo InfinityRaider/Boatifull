@@ -63,16 +63,16 @@ public class InteractionHandler {
             EnumBoatLinkResult finishResult = boatLinker.finishBoatLink(player, boat);
             if(!finishResult.isOk()) {
                 if(startResult.isOk()) {
-                    player.addChatComponentMessage(new TextComponentTranslation("boatifull.message." + startResult.toString().toLowerCase()));
+                    player.sendStatusMessage(new TextComponentTranslation("boatifull.message." + startResult.toString().toLowerCase()), false);
                 } else {
-                    player.addChatComponentMessage(new TextComponentTranslation("boatifull.message." + finishResult.toString().toLowerCase()));
+                    player.sendStatusMessage(new TextComponentTranslation("boatifull.message." + finishResult.toString().toLowerCase()), false);
                 }
             } else {
-                player.addChatComponentMessage(new TextComponentTranslation("boatifull.message." + finishResult.toString().toLowerCase()));
+                player.sendStatusMessage(new TextComponentTranslation("boatifull.message." + finishResult.toString().toLowerCase()), false);
                 this.reduceStackSize(player, stack);
             }
         } else {
-            player.addChatComponentMessage(new TextComponentTranslation("boatifull.message." + startResult.toString().toLowerCase()));
+            player.sendStatusMessage(new TextComponentTranslation("boatifull.message." + startResult.toString().toLowerCase()), false);
         }
     }
 
@@ -81,16 +81,13 @@ public class InteractionHandler {
         EntityBoatChest chestBoat = new EntityBoatChest(boat);
         boat.setDead();
         new MessageSetEntityDead(boat).sendToAll();
-        world.spawnEntityInWorld(chestBoat);
+        world.spawnEntity(chestBoat);
         this.reduceStackSize(player, stack);
     }
 
     private void reduceStackSize(EntityPlayer player, ItemStack stack) {
         if(!player.capabilities.isCreativeMode) {
-            stack.stackSize = stack.stackSize - 1;
-            if (stack.stackSize <= 0) {
-                player.inventory.setInventorySlotContents(player.inventory.currentItem, null);
-            }
+            stack.shrink(1);;
         }
     }
 
@@ -109,7 +106,7 @@ public class InteractionHandler {
         ItemStack stack = player.inventory.getStackInSlot(player.inventory.currentItem);
         IBoatLinker boatLinker = BoatLinker.getInstance();
         if(boatLinker.isValidLinkKey(stack) && boatLinker.cancelBoatLink(player)) {
-            player.addChatComponentMessage(new TextComponentTranslation("boatifull.message.cancel_link"));
+            player.sendStatusMessage(new TextComponentTranslation("boatifull.message.cancel_link"), false);
         }
     }
 }

@@ -170,7 +170,7 @@ public class BoatLinker implements IBoatLinker, IEntityLeaveOrJoinWorldListener 
             removeLinkingProgress(follower);
             EntityBoatLink boatLink = new EntityBoatLink(leader, follower, linkItem);
             this.boatLinks.put(follower, boatLink);
-            leader.getEntityWorld().spawnEntityInWorld(boatLink);
+            leader.getEntityWorld().spawnEntity(boatLink);
             boatLink.mountFollower();
         }
         return result;
@@ -183,7 +183,7 @@ public class BoatLinker implements IBoatLinker, IEntityLeaveOrJoinWorldListener 
             boatLinks.remove(follower);
             link.breakLink();
             EntityItem item = new EntityItem(follower.getEntityWorld(), follower.posX, follower.posY, follower.posZ, link.getLinkItem());
-            follower.getEntityWorld().spawnEntityInWorld(item);
+            follower.getEntityWorld().spawnEntity(item);
         } else {
             boatLinks.remove(follower);
         }

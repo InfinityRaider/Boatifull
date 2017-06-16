@@ -75,7 +75,7 @@ public class RenderEntityBoatChest extends Render<EntityBoatChest> {
             DUMMY_CHEST.numPlayersUsing = entity.getPlayersUsing();
             DUMMY_CHEST.lidAngle = entity.getLidAngle();
             DUMMY_CHEST.prevLidAngle = entity.getPrevLidAngle();
-            DUMMY_CHEST.setWorldObj(Boatifull.proxy.getClientWorld());
+            DUMMY_CHEST.setWorld(Boatifull.proxy.getClientWorld());
             renderer.renderTileEntityAt(DUMMY_CHEST, 0, 0, 0, partialTicks, -1);
 
             GlStateManager.popMatrix();

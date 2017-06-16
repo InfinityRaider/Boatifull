@@ -23,14 +23,16 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 public class EntityBoatChest extends EntityBoat implements IInventorySerializableItemHandler {
     private static DataParameter<Integer> DATA_PLAYERS_USING = EntityDataManager.createKey(EntityBoatChest.class, DataSerializers.VARINT);
 
     private static final int INVENTORY_SIZE = 27;
 
-    private ItemStack[] inventory;
+    private NonNullList<ItemStack> inventory;
 
     private float lidAngle;
     private float prevLidAngle;
@@ -39,13 +41,13 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
     @SuppressWarnings("unused")
     public EntityBoatChest(World world) {
         super(world);
-        this.inventory = new ItemStack[INVENTORY_SIZE];
+        this.inventory = NonNullList.withSize(27, ItemStack.EMPTY);
         this.setSize(1.375F, 0.8625F);
     }
 
     public EntityBoatChest(World world, double x, double y, double z) {
         super(world, x, y, z);
-        this.inventory = new ItemStack[INVENTORY_SIZE];
+        this.inventory = NonNullList.withSize(27, ItemStack.EMPTY);
         this.setSize(1.375F, 0.8625F);
     }
 
@@ -78,7 +80,7 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
         this.prevLidAngle = this.lidAngle;
         int numPlayersUsing = this.getPlayersUsing();
         if (numPlayersUsing > 0 && this.lidAngle == 0.0F) {
-            this.worldObj.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.BLOCK_CHEST_OPEN, SoundCategory.BLOCKS, 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+            this.getEntityWorld().playSound(null, this.posX, this.posY, this.posZ, SoundEvents.BLOCK_CHEST_OPEN, SoundCategory.BLOCKS, 0.5F, this.getEntityWorld().rand.nextFloat() * 0.1F + 0.9F);
         }
         if (numPlayersUsing == 0 && this.lidAngle > 0.0F || numPlayersUsing > 0 && this.lidAngle < 1.0F) {
             float oldAngle = this.lidAngle;
@@ -92,7 +94,7 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
             }
             float maxAngle = 0.5F;
             if (this.lidAngle < maxAngle && oldAngle >= maxAngle) {
-                this.worldObj.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.BLOCK_CHEST_CLOSE, SoundCategory.BLOCKS, 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+                this.getEntityWorld().playSound(null, this.posX, this.posY, this.posZ, SoundEvents.BLOCK_CHEST_CLOSE, SoundCategory.BLOCKS, 0.5F, this.getEntityWorld().rand.nextFloat() * 0.1F + 0.9F);
             }
             if (this.lidAngle < 0.0F) {
                 this.lidAngle = 0.0F;
@@ -104,10 +106,10 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
      * Overridden to drop all the items in the inventory too
      */
     @Override
-    public boolean attackEntityFrom(DamageSource source, float amount) {
+    public boolean attackEntityFrom(@Nonnull DamageSource source, float amount) {
         if (this.isEntityInvulnerable(source)) {
             return false;
-        } else if (!this.worldObj.isRemote && !this.isDead) {
+        } else if (!this.getEntityWorld().isRemote && !this.isDead) {
             if (source instanceof EntityDamageSourceIndirect && source.getEntity() != null && this.isPassenger(source.getEntity())) {
                 return false;
             } else {
@@ -117,7 +119,7 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
                 this.setBeenAttacked();
                 boolean flag = source.getEntity() instanceof EntityPlayer && ((EntityPlayer)source.getEntity()).capabilities.isCreativeMode;
                 if (flag || this.getDamageTaken() > 40.0F) {
-                    if (!flag && this.worldObj.getGameRules().getBoolean("doEntityDrops")) {
+                    if (!flag && this.getEntityWorld().getGameRules().getBoolean("doEntityDrops")) {
                         this.dropItems();
                     }
                     this.setDead();
@@ -134,15 +136,16 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
         this.entityDropItem(new ItemStack(Blocks.CHEST, 1), 0.0F);
         for(int i = 0; i < this.getSizeInventory(); i ++) {
             ItemStack stack = this.getStackInSlot(i);
-            if(stack != null && stack.stackSize > 0) {
+            if(!stack.isEmpty() && stack.getCount() > 0) {
                 this.entityDropItem(stack, 0.0F);
             }
         }
     }
 
     @Override
-    public boolean processInitialInteract(EntityPlayer player, @Nullable ItemStack stack, EnumHand hand) {
-        if(!this.worldObj.isRemote && !player.isSneaking()) {
+    @ParametersAreNonnullByDefault
+    public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
+        if(!this.getEntityWorld().isRemote && !player.isSneaking()) {
             player.displayGUIChest(this);
             player.addStat(StatList.CHEST_OPENED);
         }
@@ -167,7 +170,7 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
     }
 
     @Override
-    protected boolean canFitPassenger(Entity passenger) {
+    protected boolean canFitPassenger(@Nonnull Entity passenger) {
         return false;
     }
 
@@ -177,13 +180,13 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
     }
 
     @Override
-    protected void writeEntityToNBT(NBTTagCompound tag) {
+    protected void writeEntityToNBT(@Nonnull NBTTagCompound tag) {
         super.writeEntityToNBT(tag);
         this.writeInventoryToNBT(tag);
     }
 
     @Override
-    protected void readEntityFromNBT(NBTTagCompound tag) {
+    protected void readEntityFromNBT(@Nonnull NBTTagCompound tag) {
         super.readEntityFromNBT(tag);
         this.readInventoryFromNBT(tag);
     }
@@ -196,13 +199,13 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
      */
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+    public boolean hasCapability(@Nonnull Capability<?> capability, EnumFacing facing) {
         return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+    public <T> T getCapability(@Nonnull Capability<T> capability, EnumFacing facing) {
         return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ? (T) this : super.getCapability(capability, facing);
     }
 
@@ -215,35 +218,46 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
 
     @Override
     public int getSizeInventory() {
-        return this.inventory.length;
+        return this.inventory.size();
     }
 
     @Override
-    public ItemStack getStackInSlot(int slot) {
-        return this.isValidSlot(slot) ? this.inventory[slot] : null;
+    public boolean isEmpty() {
+        return false;
     }
 
-    @Nullable
+    @Override
+    @Nonnull
+    public ItemStack getStackInSlot(int slot) {
+        return this.isValidSlot(slot) ? this.inventory.get(slot) : ItemStack.EMPTY;
+    }
+
+    @Override
+    public int getSlotLimit(int slot) {
+        return 64;
+    }
+
+    @Nonnull
     @Override
     public ItemStack decrStackSize(int index, int count) {
         return this.extractItem(index, count, false);
     }
 
-    @Nullable
     @Override
+    @Nonnull
     public ItemStack removeStackFromSlot(int index) {
         if(this.isValidSlot(index)) {
-            ItemStack stack = this.inventory[index];
-            this.setInventorySlotContents(index, null);
+            ItemStack stack = this.inventory.get(index);
+            this.setInventorySlotContents(index, ItemStack.EMPTY);
             return stack;
         }
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
-    public void setInventorySlotContents(int index, @Nullable ItemStack stack) {
+    public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
         if(this.isValidSlot(index)) {
-            this.inventory[index] = stack;
+            this.inventory.set(index, stack);
             this.markDirty();
         }
     }
@@ -257,13 +271,13 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
     public void markDirty() {}
 
     @Override
-    public boolean isUseableByPlayer(EntityPlayer player) {
+    public boolean isUsableByPlayer(@Nonnull EntityPlayer player) {
         return true;
     }
 
     @Override
-    public void openInventory(EntityPlayer player) {
-        if(!this.worldObj.isRemote) {
+    public void openInventory(@Nonnull EntityPlayer player) {
+        if(!this.getEntityWorld().isRemote) {
             int amount = this.getPlayersUsing();
             amount = amount <= 0 ? 1 : amount + 1;
             this.setPlayersUsing(amount);
@@ -271,8 +285,8 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
     }
 
     @Override
-    public void closeInventory(EntityPlayer player) {
-        if(!this.worldObj.isRemote) {
+    public void closeInventory(@Nonnull EntityPlayer player) {
+        if(!this.getEntityWorld().isRemote) {
             int amount = this.getPlayersUsing();
             amount = amount <= 1 ? 0 : amount - 1;
             this.setPlayersUsing(amount);
@@ -280,7 +294,7 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
     }
 
     @Override
-    public boolean isItemValidForSlot(int index, ItemStack stack) {
+    public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
         return false;
     }
 
@@ -299,7 +313,7 @@ public class EntityBoatChest extends EntityBoat implements IInventorySerializabl
 
     @Override
     public void clear() {
-        this.inventory = new ItemStack[this.getSlots()];
+        this.inventory = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
     }
 
     public static class RenderFactory implements IRenderFactory<EntityBoatChest> {
