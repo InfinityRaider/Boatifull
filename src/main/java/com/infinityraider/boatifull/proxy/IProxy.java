@@ -28,4 +28,7 @@ public interface IProxy extends IProxyBase {
         this.registerEventHandler(BoatLinker.getInstance());
         this.registerEventHandler(InteractionHandler.getInstance());
     }
+
+    @Override
+    default void registerSounds() {}
 }
